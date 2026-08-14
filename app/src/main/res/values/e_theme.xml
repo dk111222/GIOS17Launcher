@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Local stand-ins for foundation.e:elib theme tokens (Maven repo is not public). -->
+    <color name="e_accent_light">#007AFF</color>
+    <color name="e_action_bar_light">#FFFFFF</color>
+    <color name="e_background_light">#F2F2F7</color>
+    <color name="e_primary_text_color_light">#DE000000</color>
+    <color name="e_primary_text_color_dark">#FFFFFFFF</color>
+    <color name="e_secondary_text_color_dark">#B3FFFFFF</color>
+    <color name="e_launcher_widget_background">#F2FFFFFF</color>
+    <color name="e_launcher_search_background">#E6FFFFFF</color>
+</resources>

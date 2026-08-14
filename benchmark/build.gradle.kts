@@ -10,36 +10,30 @@ android {
     compileSdk = Versions.COMPILE_SDK
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions { jvmTarget = "1.8" }
+    kotlinOptions { jvmTarget = "17" }
 
     defaultConfig {
         minSdk = Versions.MIN_SDK
         targetSdk = Versions.TARGET_SDK
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    flavorDimensions.add("api")
+    flavorDimensions += "api"
     productFlavors {
         create("apiQ") { dimension = "api" }
-
         create("apiR") { dimension = "api" }
-
         create("apiS") { dimension = "api" }
     }
 
     buildTypes {
-        // This benchmark buildType is used for benchmarking, and should function like your
-        // release build (for example, with minification on). It"s signed with a debug key
-        // for easy local/CI testing.
         val benchmark by creating {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            matchingFallbacks.add("release")
+            matchingFallbacks += listOf("release")
         }
     }
 

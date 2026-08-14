@@ -6,7 +6,7 @@ public class CharSequenceConverter {
 
     @TypeConverter
     public static String toString(CharSequence value) {
-        return value.toString();
+        return value == null ? null : value.toString();
     }
 
     @TypeConverter

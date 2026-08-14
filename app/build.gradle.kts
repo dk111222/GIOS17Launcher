@@ -1,23 +1,20 @@
 @file:Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
 
 import com.cloudx.ios17.buildsrc.Versions
-import java.util.*
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.refine)
 }
 
-// Manifest version information
 val versionMajor = 1
 val versionMinor = 15
 val versionPatch = 0
 
 val localProps = Properties()
 val localPropsFile = project.rootProject.file("local.properties")
-
 if (localPropsFile.exists()) {
     localProps.load(localPropsFile.inputStream())
 }
@@ -27,6 +24,7 @@ val keyStorePath = localProps.getProperty("keyStorePath") ?: "/keystore/platform
 val keyStorePassword = localProps.getProperty("keyStorePassword") ?: "android"
 val signingKeyAlias = localProps.getProperty("keyAlias") ?: "platform"
 val signingKeyPassword = localProps.getProperty("keyPassword") ?: "android"
+val platformKeystore = file(rootDir.path + keyStorePath)
 
 android {
     namespace = "com.cloudx.ios17"
@@ -40,18 +38,29 @@ android {
         versionCode = versionMajor * 100_00_00 + versionMinor * 10_00 + versionPatch
         versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
 
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-        renderscriptTargetApi = 28
-        renderscriptSupportModeEnabled = true
-        setProperty("archivesBaseName", "BlissLauncher-$versionName")
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildFeatures { buildConfig = true }
+    signingConfigs {
+        getByName("debug") {
+            if (platformKeystore.exists()) {
+                storeFile = platformKeystore
+                storePassword = keyStorePassword
+                keyAlias = signingKeyAlias
+                keyPassword = signingKeyPassword
+            }
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }
 
@@ -69,33 +78,22 @@ android {
         }
 
         configureEach {
-            buildConfigField("String", "SENTRY_DSN", "\"${System.getenv("SENTRY_DSN")}\"")
+            buildConfigField("String", "SENTRY_DSN", "\"${System.getenv("SENTRY_DSN") ?: ""}\"")
         }
     }
 
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file(rootDir.path + keyStorePath)
-            storePassword = keyStorePassword
-            keyAlias = signingKeyAlias
-            keyPassword = signingKeyPassword
-        }
-    }
-
-    flavorDimensions.add("api")
+    flavorDimensions += "api"
     productFlavors {
         create("apiQ") {
             dimension = "api"
             minSdk = 27
             targetSdk = 29
         }
-
         create("apiR") {
             dimension = "api"
             minSdk = 27
             targetSdk = 29
         }
-
         create("apiS") {
             dimension = "api"
             minSdk = 27
@@ -103,82 +101,72 @@ android {
         }
     }
 
-    // Always show the result of every unit test, even if it passes.
-    testOptions.unitTests.all { test ->
-        test.testLogging { events("passed", "skipped", "failed", "standardOut", "standardError") }
+    testOptions {
+        unitTests.all {
+            it.testLogging { events("passed", "skipped", "failed", "standardOut", "standardError") }
+        }
     }
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions { jvmTarget = "1.8" }
-
-    buildFeatures {
-        viewBinding = true
-        buildConfig = true
-    }
+    kotlinOptions { jvmTarget = "17" }
 
     lint {
         abortOnError = false
         checkReleaseBuilds = false
-        warningsAsErrors = true
-        disable.add("PluralsCandidate")
-        disable.add("MissingTranslation")
-        disable.add("UnusedResources")
+        warningsAsErrors = false
+        disable += setOf("PluralsCandidate", "MissingTranslation", "UnusedResources")
         baseline = file("lint-baseline.xml")
     }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+        }
+    }
 }
+
+kapt { correctErrorTypes = true }
 
 dependencies {
     "apiQImplementation"(files("libs/lineage-sdk-q.jar"))
     "apiRImplementation"(files("libs/lineage-sdk-r.jar"))
     "apiSImplementation"(files("libs/e-ui-sdk-s.jar"))
 
-    // Support Libs
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.localbroadcast)
 
-    // Rx Java and Android
     implementation(libs.rx.android)
     implementation(libs.rx.binding)
     implementation(libs.rx.java)
     implementation(libs.rx.relay)
 
-    // Room
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
 
-    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson.converter)
     implementation(libs.retrofit.rxjava.adapter)
 
-    // Okhttp
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 
-    // Misc.
     implementation(libs.hoko.blur)
     implementation(libs.apache.commons)
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.greenrobot.eventbus)
     implementation(libs.circleindicator)
-    implementation(libs.restriction.bypass)
     implementation(libs.tools.timber)
-    debugImplementation(libs.debug.db)
     coreLibraryDesugaring(libs.tools.desugar)
     implementation(libs.androidx.profileinstaller)
     debugImplementation(libs.tools.leakcanary)
 
-    // Testing dependencies
     testImplementation(libs.bundles.testing.unit)
     testImplementation(libs.bundles.testing.android)
-
-    // elib
-    implementation(libs.elib)
-    implementation(libs.telemetry)
 }

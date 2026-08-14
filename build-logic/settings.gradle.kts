@@ -2,12 +2,10 @@
 
 rootProject.name = "build-logic"
 
-enableFeaturePreview("VERSION_CATALOGS")
-
 pluginManagement {
     repositories {
-        mavenCentral()
         google()
+        mavenCentral()
         gradlePluginPortal()
     }
 }
@@ -16,8 +14,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
+        gradlePluginPortal()
     }
+    versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
 }
 
 include("kotlin-plugins")
