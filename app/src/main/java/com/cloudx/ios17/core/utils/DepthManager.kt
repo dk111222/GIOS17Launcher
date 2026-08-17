@@ -2,16 +2,14 @@ package com.cloudx.ios17.core.utils
 
 import android.app.WallpaperManager
 import android.os.IBinder
+import android.util.Log
 import android.view.View
-import com.cloudx.ios17.features.launcher.LauncherActivity
+import java.lang.reflect.Method
 
 class DepthManager(private val launcher: com.cloudx.ios17.features.launcher.LauncherActivity) {
 
-    private val wallpaperManager = launcher.getSystemService(WallpaperManager::class.java)!!
-    private val setWallpaperZoomOut =
-        WallpaperManager::class
-            .java
-            .getMethod("setWallpaperZoomOut", IBinder::class.java, Float::class.java)
+    private val wallpaperManager = launcher.getSystemService(WallpaperManager::class.java)
+    private val setWallpaperZoomOut: Method? = resolveSetWallpaperZoomOut()
 
     init {
         launcher.rootView.addOnAttachStateChangeListener(
@@ -26,9 +24,30 @@ class DepthManager(private val launcher: com.cloudx.ios17.features.launcher.Laun
     }
 
     fun updateDepth() {
-        val windowToken = launcher.rootView.windowToken
-        if (windowToken != null) {
-            setWallpaperZoomOut.invoke(wallpaperManager, windowToken, 1)
+        val method = setWallpaperZoomOut ?: return
+        val manager = wallpaperManager ?: return
+        val windowToken = launcher.rootView.windowToken ?: return
+        try {
+            method.invoke(manager, windowToken, 1f)
+        } catch (t: Throwable) {
+            Log.w(TAG, "setWallpaperZoomOut is unavailable on this device", t)
         }
+    }
+
+    private fun resolveSetWallpaperZoomOut(): Method? {
+        return try {
+            WallpaperManager::class.java.getMethod(
+                "setWallpaperZoomOut",
+                IBinder::class.java,
+                java.lang.Float.TYPE
+            )
+        } catch (t: Throwable) {
+            Log.w(TAG, "WallpaperManager.setWallpaperZoomOut not accessible", t)
+            null
+        }
+    }
+
+    private companion object {
+        const val TAG = "DepthManager"
     }
 }

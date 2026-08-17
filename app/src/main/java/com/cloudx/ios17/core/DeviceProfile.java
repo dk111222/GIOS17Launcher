@@ -234,7 +234,13 @@ public class DeviceProfile {
         float a = 1.578f;
         float b = 1.23f;
 
-        iconSizePx = (int) (0.75 * widthPx / widthCm);
+        float iconScale = scale;
+        // On 320dp-wide devices, shrink app icons by one third (to 2/3 size).
+        if (res.getConfiguration().smallestScreenWidthDp <= 320) {
+            iconScale *= 2f / 3f;
+        }
+
+        iconSizePx = (int) (0.75 * widthPx / widthCm * iconScale);
         iconTextSizePx = (int) (Utilities.pxFromSp(12, dm) * scale);
         iconDrawablePaddingPx = (availableWidthPx - iconSizePx * 4) / 5;
 

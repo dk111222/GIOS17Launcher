@@ -80,9 +80,14 @@ public class AdaptiveIconProvider {
             XmlResourceParser parser = null;
             if (iconId != 0) {
                 try {
-                    parser = resources.getXml(iconId);
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
+                    android.util.TypedValue typedValue = new android.util.TypedValue();
+                    resources.getValue(iconId, typedValue, true);
+                    CharSequence path = typedValue.string;
+                    if (path != null && path.toString().endsWith(".xml")) {
+                        parser = resources.getXml(iconId);
+                    }
+                } catch (Exception e) {
+                    Timber.tag(TAG).d(e, "Icon %s is not an adaptive XML", iconId);
                     parser = null;
                 }
             }
