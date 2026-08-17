@@ -10,6 +10,7 @@ retrofit = "2.11.0"
 room = "2.5.0"
 spotless = "8.9.0"
 uiautomator = "2.3.0"
+material = "1.10.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "axCore" }
@@ -58,6 +59,7 @@ tools-desugar = "com.android.tools:desugar_jdk_libs:2.1.2"
 tools-leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 tools-timber = "com.jakewharton.timber:timber:5.0.1"
 timber = "com.jakewharton.timber:timber:5.0.1"
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>格力智慧家庭 · Android 概念 Demo</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/panels.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<div class="stage">
+  <div class="side-tools">
+    <div class="st-title">板式</div>
+    <div class="mode-seg">
+      <button class="tool-btn on" id="btnModeClassic">经典板式</button>
+      <button class="tool-btn" id="btnModeNeo">创新板式</button>
+    </div>
+    <div class="st-title">DEMO 控制台</div>
+    <button class="tool-btn" id="btnFrame">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2.5" width="12" height="19" rx="3"/></svg>
+      <span id="btnFrameT">隐藏手机框</span></button>
+    <button class="tool-btn cls-only" id="btnGree">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M6 10v9h12v-9"/></svg>
+      负一屏 V1</button>
+    <button class="tool-btn cls-only" id="btnGreeV2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/></svg>
+      负一屏 V2</button>
+    <button class="tool-btn cls-only" id="btnGreeV3">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11.5 12 4l8 7.5"/><path d="M6.5 10.5V20h11v-9.5"/><path d="M10 20v-5h4v5"/></svg>
+      负一屏 V3</button>
+    <button class="tool-btn neo-only" id="btnNeoM1" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/></svg>
+      负一屏</button>
+    <button class="tool-btn neo-only" id="btnNeoCC" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      下拉控制中心</button>
+    <button class="tool-btn" id="btnHome">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/></svg>
+      回到桌面</button>
+    <button class="tool-btn" id="btnShade">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      下拉通知栏</button>
+    <div class="tool-hint">操作提示：<br>· 桌面右滑进入负一屏<br>· 点击状态栏下拉通知<br>· 所有卡片、按钮均可点击<br>· 弹窗背景为磨砂玻璃遮罩<br><br>创新板式：<br>· 左右滑 = 桌面 ↔ 右一屏应用库<br>· 桌面下滑 / 点搜索条 = 全局搜索<br>· 桌面上滑 = 直达应用库<br>· 点按底部横条 / 快速上划 = 回桌面<br>· 长按横条 / 拖住上划 = 多任务</div>
+  </div>
+
+  <div class="phone-shell" id="phoneShell">
+    <div class="side-key"></div><div class="side-key vol"></div><div class="side-key vol2"></div>
+    <div class="screen" id="screen">
+      <div class="viewport" id="viewport">
+        <!-- 桌面 -->
+        <div class="page launcher" id="launcher"></div>
+        <!-- 负一屏 -->
+        <div class="page gree" id="gree"></div>
+        <!-- 页面栈 -->
+        <div id="stack"></div>
+      </div>
+      <div class="punch"></div>
+      <div class="statusbar sb-light" id="statusbar"></div>
+      <div class="shade" id="shade"></div>
+      <div id="modalRoot"></div>
+      <div class="neo-gbar" id="neoGbar" style="display:none"><i></i></div>
+      <div class="cc-hot" id="ccHot" style="display:none"></div>
+      <div class="ntf-hot" id="ntfHot" style="display:none"></div>
+      <div class="ncc" id="neoCC"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+</div>
+<script src="js/core.js"></script>
+<script src="js/icons-launcher.js"></script>
+<script src="js/data.js"></script>
+<script src="js/gree-home.js"></script>
+<script src="js/events.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/devices.js"></script>
+<script src="js/devices-extra.js"></script>
+<script src="js/services.js"></script>
+<script src="js/neo.js"></script>
+<script src="js/neo-bind.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

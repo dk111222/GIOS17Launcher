@@ -1,0 +1,22 @@
+{
+  "rootHash": "f6a9161101a86413632ed8d16826bc53705e9967ab0f414f323c12b0fd797618",
+  "timestamp": 1786085793095,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "server.mjs",
+      "hash": "f6a9161101a86413632ed8d16826bc53705e9967ab0f414f323c12b0fd797618",
+      "size": 1632,
+      "modified": 1786085772126.6255
+    }
+  ],
+  "tree": {
+    "hash": "f6a9161101a86413632ed8d16826bc53705e9967ab0f414f323c12b0fd797618",
+    "file": {
+      "path": "server.mjs",
+      "hash": "f6a9161101a86413632ed8d16826bc53705e9967ab0f414f323c12b0fd797618",
+      "size": 1632,
+      "modified": 1786085772126.6255
+    }
+  }
+}
