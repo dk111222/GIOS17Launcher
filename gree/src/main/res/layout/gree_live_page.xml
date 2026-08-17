@@ -71,20 +71,24 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_gree_scan" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/gree_avatar_btn"
+                <FrameLayout
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_marginStart="9dp"
-                    android:clickable="true"
-                    android:contentDescription="@string/gree_toast_demo"
-                    android:elevation="4dp"
-                    android:focusable="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/a_dad"
-                    app:shapeAppearanceOverlay="@style/GreeShapeCircle"
-                    app:strokeColor="@color/gree_neo_white_95"
-                    app:strokeWidth="2dp" />
+                    android:background="@drawable/gree_avatar_ring"
+                    android:elevation="4dp">
+
+                    <ImageView
+                        android:id="@+id/gree_avatar_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:contentDescription="@string/gree_toast_demo"
+                        android:focusable="true"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/a_dad" />
+                </FrameLayout>
             </LinearLayout>
 
             <!-- Section: 我的场景 -->

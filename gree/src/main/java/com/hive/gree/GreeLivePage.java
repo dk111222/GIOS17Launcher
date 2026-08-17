@@ -82,6 +82,8 @@ public class GreeLivePage extends FrameLayout {
         bindBanner();
         bindGreeServices();
         bindPhoneServices();
+        ImageView avatar = findViewById(R.id.gree_avatar_btn);
+        GreeImageClip.clipCircle(avatar);
     }
 
     private void bindTopBar() {
@@ -109,7 +111,9 @@ public class GreeLivePage extends FrameLayout {
             int index = row * 2 + col;
             SceneCard scene = scenes[index];
             View card = inflateCard(R.layout.item_gree_scene_card);
-            ((ImageView) card.findViewById(R.id.scene_icon)).setImageResource(scene.iconRes);
+            ImageView icon = card.findViewById(R.id.scene_icon);
+            icon.setImageResource(scene.iconRes);
+            GreeImageClip.clipRound(icon, dp(12));
             ((TextView) card.findViewById(R.id.scene_title)).setText(scene.titleRes);
             ((TextView) card.findViewById(R.id.scene_desc)).setText(scene.descRes);
             String title = getContext().getString(scene.titleRes);
@@ -181,7 +185,9 @@ public class GreeLivePage extends FrameLayout {
         addTwoColumnGrid(grid, services.length, (row, col) -> {
             ServiceCard service = services[row * 2 + col];
             View card = inflateCard(R.layout.item_gree_service_card);
-            ((ImageView) card.findViewById(R.id.service_icon)).setImageResource(service.iconRes);
+            ImageView icon = card.findViewById(R.id.service_icon);
+            icon.setImageResource(service.iconRes);
+            GreeImageClip.clipRound(icon, dp(14));
             ((TextView) card.findViewById(R.id.service_title)).setText(service.titleRes);
             ((TextView) card.findViewById(R.id.service_desc)).setText(service.descRes);
             String title = getContext().getString(service.titleRes);
@@ -222,6 +228,8 @@ public class GreeLivePage extends FrameLayout {
         });
 
         View news = inflateCard(R.layout.item_gree_news_card);
+        ImageView newsImage = news.findViewById(R.id.news_image);
+        GreeImageClip.clipRound(newsImage, dp(14));
         news.setOnClickListener(v -> toast("新闻速览"));
         container.addView(wrapFullWidth(news));
     }
@@ -365,6 +373,7 @@ public class GreeLivePage extends FrameLayout {
         public void onBindViewHolder(@NonNull Holder holder, int position) {
             BannerItem item = items[position];
             holder.itemView.setBackgroundResource(item.bgRes);
+            holder.itemView.setClipToOutline(true);
             holder.tag.setBackgroundResource(R.drawable.gree_banner_tag_bg);
             holder.tag.setText(item.tagRes);
             holder.title.setText(item.titleRes);
@@ -373,6 +382,7 @@ public class GreeLivePage extends FrameLayout {
             if (item.imageRes != 0) {
                 holder.image.setVisibility(VISIBLE);
                 holder.image.setImageResource(item.imageRes);
+                GreeImageClip.clipRound(holder.image, dp(12));
             } else {
                 holder.image.setVisibility(GONE);
             }

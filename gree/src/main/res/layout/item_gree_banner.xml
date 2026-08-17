@@ -66,12 +66,11 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/banner_image"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:contentDescription="@null"
-            android:scaleType="fitCenter"
-            app:shapeAppearanceOverlay="@style/GreeShapeRounded12" />
+            android:scaleType="fitCenter" />
     </LinearLayout>
 </FrameLayout>
