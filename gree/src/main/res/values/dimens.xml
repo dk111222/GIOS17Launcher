@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gree_page_h_padding">14dp</dimen>
+    <dimen name="gree_card_radius">22dp</dimen>
+    <dimen name="gree_scene_radius">18dp</dimen>
+    <dimen name="gree_grid_gap">9dp</dimen>
+</resources>

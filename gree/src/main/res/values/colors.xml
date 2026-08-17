@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gree_neo_bg">#F4F1EA</color>
+    <color name="gree_neo_ink">#1C1A15</color>
+    <color name="gree_neo_ink2">#6D675A</color>
+    <color name="gree_neo_ink3">#8F8A7C</color>
+    <color name="gree_neo_accent">#DF7642</color>
+    <color name="gree_neo_accent_dark">#C25E2C</color>
+    <color name="gree_neo_card">#FFFDF9</color>
+    <color name="gree_neo_card_border">#ECE7D8</color>
+    <color name="gree_neo_pill_bg">#FDF1E6</color>
+    <color name="gree_neo_pill_border">#F0DCC9</color>
+    <color name="gree_neo_divider">#D9D2BD</color>
+    <color name="gree_neo_search_hint">#8F8A7C</color>
+    <color name="gree_neo_white_78">#C7FFFFFF</color>
+    <color name="gree_neo_white_95">#F2FFFFFF</color>
+    <color name="gree_banner_cyan_start">#0E7490</color>
+    <color name="gree_banner_cyan_end">#06B6D4</color>
+    <color name="gree_banner_orange_start">#B45309</color>
+    <color name="gree_banner_orange_end">#F59E0B</color>
+    <color name="gree_banner_purple_start">#6D28D9</color>
+    <color name="gree_banner_purple_end">#A855F7</color>
+</resources>

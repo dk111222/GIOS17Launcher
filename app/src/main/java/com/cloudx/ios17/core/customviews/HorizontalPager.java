@@ -346,7 +346,8 @@ public class HorizontalPager extends ViewGroup implements Insettable {
         boolean yMoved = yDiff > mTouchSlop;
 
         if (xMoved || yMoved) {
-            if (yMoved && (y - mLastMotionY) > 0 && yDiff > xDiff && inThresholdRegion() && currentPage != 0) {
+            if (yMoved && (y - mLastMotionY) > 0 && yDiff > xDiff && inThresholdRegion()
+                    && currentPage >= 2) {
                 mTouchState = TOUCH_STATE_VERTICAL_SCROLLING;
                 ((OnSwipeDownListener) getContext()).onSwipeStart();
             } else if (xMoved && yDiff < xDiff && inThresholdRegion()) {

@@ -165,6 +165,7 @@ dependencies {
     implementation(libs.tools.timber)
     coreLibraryDesugaring(libs.tools.desugar)
     implementation(libs.androidx.profileinstaller)
+    implementation(project(":gree"))
     debugImplementation(libs.tools.leakcanary)
 
     testImplementation(libs.bundles.testing.unit)

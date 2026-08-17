@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gree_search_hint">搜索设备、服务、应用…</string>
+    <string name="gree_section_scenes">我的场景</string>
+    <string name="gree_section_scenes_sub">4 个 · 一键执行</string>
+    <string name="gree_view_all_devices">查看所有设备 ›</string>
+    <string name="gree_scene_settings">设置</string>
+    <string name="gree_section_gree_services">格力服务</string>
+    <string name="gree_section_gree_services_sub">专属</string>
+    <string name="gree_section_phone_services">手机服务</string>
+    <string name="gree_section_phone_services_sub">动态展示</string>
+    <string name="gree_scene_execute">执行</string>
+
+    <string name="gree_scene_home">回家模式</string>
+    <string name="gree_scene_home_desc">灯光 · 空调 · 新风自动开启</string>
+    <string name="gree_scene_away">离家模式</string>
+    <string name="gree_scene_away_desc">全屋布防 · 电器关闭</string>
+    <string name="gree_scene_movie">观影模式</string>
+    <string name="gree_scene_movie_desc">灯光渐暗 · 氛围就绪</string>
+    <string name="gree_scene_sleep">睡眠模式</string>
+    <string name="gree_scene_sleep_desc">主卧 27° · 灯光关闭</string>
+
+    <string name="gree_banner_tag_new">新品</string>
+    <string name="gree_banner_tag_sale">优惠</string>
+    <string name="gree_banner_tag_live">LIVE</string>
+    <string name="gree_banner_1_title">格力除湿机 · 新品首发</string>
+    <string name="gree_banner_1_desc">梅雨天也能干爽舒适 · 直降 300 元</string>
+    <string name="gree_banner_1_btn">去看看</string>
+    <string name="gree_banner_2_title">空调以旧换新季</string>
+    <string name="gree_banner_2_desc">旧机至高补贴 800 元 · 新一级能效更省电</string>
+    <string name="gree_banner_2_btn">立即换新</string>
+    <string name="gree_banner_3_title">董明珠店 · 直播中</string>
+    <string name="gree_banner_3_desc">今晚 19:30 全屋智能专场 · 下单抽免单</string>
+    <string name="gree_banner_3_btn">进入直播间</string>
+
+    <string name="gree_svc_clean_title">清洗服务提醒</string>
+    <string name="gree_svc_clean_desc">客厅空调累计运行 326 小时\n建议预约深度清洗</string>
+    <string name="gree_svc_trade_title">以旧换新</string>
+    <string name="gree_svc_trade_desc">书房空调已使用 10 年+\n换新至高补贴 800 元</string>
+    <string name="gree_svc_weather_title">天气联动推荐</string>
+    <string name="gree_svc_weather_desc">今日 31° 晴热 · 空调焕新季\n新一级能效直降</string>
+    <string name="gree_svc_report_title">家庭数据报告</string>
+    <string name="gree_svc_report_desc">本周用电 86.4 度 · 省 8%\n用水 3.2 吨 · 食材告急 2 种</string>
+
+    <string name="gree_phone_weather_title">珠海 · 多云 31°</string>
+    <string name="gree_phone_weather_desc">湿度 82% · 东南风 3 级 · 傍晚转晴\n15:00 32° · 17:00 31° · 19:00 29°</string>
+    <string name="gree_phone_cal_title">明天 9:00 项目评审会</string>
+    <string name="gree_phone_cal_desc">今天 18:00 接孩子 · 20:00 与妈妈视频</string>
+    <string name="gree_phone_exp_title">快递 1 个待取</string>
+    <string name="gree_phone_exp_desc">净水器滤芯已到驿站\n取件码 8-2-6305</string>
+    <string name="gree_phone_trip_title">周六 G6158 珠海 → 广州南</string>
+    <string name="gree_phone_trip_desc">10:35 开 · 06 车 12A · 已加提醒</string>
+    <string name="gree_phone_memo_title">备忘录</string>
+    <string name="gree_phone_memo_desc">购物清单 · 牛奶 / 鸡蛋 / 西红柿 3 条</string>
+    <string name="gree_phone_news_title">新闻速览</string>
+    <string name="gree_phone_news_desc">格力电器发布 2026 冷年全屋智能新品\n珠海今明多云转晴，周末最高 33°</string>
+
+    <string name="gree_toast_scene">已执行「%1$s」场景</string>
+    <string name="gree_toast_demo">演示环境：%1$s</string>
+</resources>
