@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gree_image_radius_12">12dp</dimen>
+    <dimen name="gree_image_radius_14">14dp</dimen>
+    <dimen name="gree_banner_radius">20dp</dimen>
+    <dimen name="gree_scene_card_radius">18dp</dimen>
+    <style name="GreeShapeCircle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="GreeShapeRounded12">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/gree_image_radius_12</item>
+    </style>
+    <style name="GreeShapeRounded14">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/gree_image_radius_14</item>
+    </style>
+    <style name="GreeShapeRounded20">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/gree_banner_radius</item>
+    </style>
+</resources>

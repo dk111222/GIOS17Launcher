@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="96dp">
+    android:layout_height="match_parent"
+    android:clipToOutline="true">
 
     <LinearLayout
         android:id="@+id/banner_content"
@@ -22,7 +24,7 @@
                 android:id="@+id/banner_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/gree_neo_pill_btn"
+                android:background="@drawable/gree_banner_tag_bg"
                 android:paddingStart="8dp"
                 android:paddingTop="2dp"
                 android:paddingEnd="8dp"
@@ -64,11 +66,12 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/banner_image"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:contentDescription="@null"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            app:shapeAppearanceOverlay="@style/GreeShapeRounded12" />
     </LinearLayout>
 </FrameLayout>
