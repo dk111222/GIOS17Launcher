@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/gree_neo_card_bg"
+    android:orientation="vertical"
+    android:paddingStart="13dp"
+    android:paddingTop="13dp"
+    android:paddingEnd="13dp"
+    android:paddingBottom="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/gree_room_device_icon_frame"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/gree_dca_ic_off">
+
+            <ImageView
+                android:id="@+id/gree_room_device_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:scaleType="centerInside" />
+        </FrameLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/gree_room_device_power"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/gree_dca_power_off"
+            android:contentDescription="@string/gree_all_devices_state_running"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_gree_power" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/gree_room_device_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/gree_neo_ink"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/gree_room_device_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/gree_neo_ink3"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

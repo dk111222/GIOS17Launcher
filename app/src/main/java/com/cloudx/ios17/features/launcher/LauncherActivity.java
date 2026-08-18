@@ -31,6 +31,7 @@ import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -48,16 +49,19 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextThemeWrapper;
 import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -73,6 +77,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -126,6 +131,8 @@ import com.cloudx.ios17.features.weather.WeatherSourceListenerService;
 import com.cloudx.ios17.features.weather.WeatherUtils;
 import com.cloudx.ios17.features.widgets.WidgetsActivity;
 import com.hive.gree.GreeLivePage;
+import com.hive.gree.GreePlusPage;
+import com.hive.gree.GreeScanActivity;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 
 import java.util.ArrayList;
@@ -304,13 +311,14 @@ public class LauncherActivity extends AppCompatActivity
         WallpaperManagerCompat.OnColorsChangedListener {
 
     private static final int GREE_LIVE_PAGE = 0;
-    private static final int WIDGET_PAGE = 1;
+    private static final int GREE_PLUS_PAGE = 1;
     private static final int WORKSPACE_PAGE_OFFSET = 2;
     public static final int REORDER_TIMEOUT = 350;
     private final static int EMPTY_LOCATION_DRAG = -999;
     private static final int REQUEST_PERMISSION_CALL_PHONE = 14;
     private static final int REQUEST_LOCATION_SOURCE_SETTING = 267;
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 586;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 587;
     public static final String ACTION_LAUNCHER_RESUME = "com.cloudx.ios17.LauncherActivity.LAUNCHER_RESUME";
     public static final String EXTRA_FRAGMENT_ARG_KEY = ":settings:fragment_args_key";
     public static final String EXTRA_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args";
@@ -376,6 +384,7 @@ public class LauncherActivity extends AppCompatActivity
 
     private FrameLayout widgetsPage;
     private GreeLivePage greeLivePage;
+    private GreePlusPage greePlusPage;
     private SearchInputDisposableObserver searchDisposableObserver;
     private AnimatorSet currentAnimator;
     private Rect startBounds;
@@ -478,6 +487,8 @@ public class LauncherActivity extends AppCompatActivity
             mDepthManager = new DepthManager(this);
         }
 
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
         if (ThemesKt.isWorkspaceDarkText(this)) {
             int flags = mLauncherView.getSystemUiVisibility();
             flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
@@ -488,6 +499,7 @@ public class LauncherActivity extends AppCompatActivity
         mLightLayoutInflater = getLayoutInflater().cloneInContext(lightContext);
 
         mInsetsController = new WindowInsetsControllerCompat(getWindow(), mLauncherView);
+        mInsetsController.show(WindowInsetsCompat.Type.statusBars());
     }
 
     public void registerUnlockBroadcastReceiver() {
@@ -809,8 +821,9 @@ public class LauncherActivity extends AppCompatActivity
                         getResources().getDimensionPixelSize(R.dimen.dotSize),
                         getResources().getDimensionPixelSize(R.dimen.dotSize));
                 dot.setLayoutParams(params);
-                mIndicator.addView(dot);
-                mHorizontalPager.addView(pages.get(current));
+                int insertAt = getWidgetPageIndex();
+                mIndicator.addView(dot, insertAt);
+                mHorizontalPager.addView(pages.get(current), insertAt);
             }
             launcherItem.screenId = current;
             launcherItem.cell = pages.get(current).getChildCount() - 1;
@@ -1195,8 +1208,9 @@ public class LauncherActivity extends AppCompatActivity
         createPageChangeListener();
         createFolderTitleListener();
         createDragListener();
-        createWidgetsPage();
+        createGreePlusPage();
         createGreeLivePage();
+        createWidgetsPage();
         createIndicator();
         createOrUpdateBadgeCount();
         allAppsDisplayed = true;
@@ -1349,9 +1363,8 @@ public class LauncherActivity extends AppCompatActivity
                 float pagePos = (float) scrollX / mDeviceProfile.availableWidthPx;
                 updateHotseatForPagePosition(pagePos);
 
-                if (pagePos < WIDGET_PAGE) {
-                    float fraction = Math.min(1f, WIDGET_PAGE - pagePos);
-                    blurLayer.setAlpha(fraction);
+                if (mFolderWindowContainer.getVisibility() != VISIBLE) {
+                    blurLayer.setAlpha(pageBlurAlpha(pagePos));
                 }
                 if (isViewScrolling) {
                     dragDropEnabled = false;
@@ -1363,24 +1376,25 @@ public class LauncherActivity extends AppCompatActivity
                 isViewScrolling = false;
                 updateHotseatForPagePosition(page);
 
-                blurLayer.setAlpha(
-                        (page == GREE_LIVE_PAGE || mFolderWindowContainer.getVisibility() == VISIBLE) ? 1f : 0f);
+                blurLayer.setAlpha((shouldBlurPage(page) || mFolderWindowContainer.getVisibility() == VISIBLE) ? 1f : 0f);
 
                 if (currentPageNumber != page) {
                     int prevPage = currentPageNumber;
                     currentPageNumber = page;
+                    if (prevPage == GREE_LIVE_PAGE && page != GREE_LIVE_PAGE && greeLivePage != null) {
+                        greeLivePage.clearSearch();
+                    }
                     navbarAnimator.cancel();
-                    if (currentPageNumber < WORKSPACE_PAGE_OFFSET) {
+                    mInsetsController.show(WindowInsetsCompat.Type.statusBars());
+                    boolean hideChrome = shouldHideSystemChrome(currentPageNumber);
+                    boolean prevHideChrome = shouldHideSystemChrome(prevPage);
+                    if (hideChrome) {
                         navbarAnimator.start();
-                        if (currentPageNumber == WIDGET_PAGE) {
+                        if (isWidgetPage(currentPageNumber)) {
                             refreshSuggestedApps(widgetsPage, forceRefreshSuggestedApps);
                         }
-                        mInsetsController.hide(WindowInsetsCompat.Type.statusBars());
-                    } else if (prevPage < WORKSPACE_PAGE_OFFSET && currentPageNumber == WORKSPACE_PAGE_OFFSET) {
-                        mInsetsController.show(WindowInsetsCompat.Type.statusBars());
+                    } else if (prevHideChrome) {
                         navbarAnimator.reverse();
-                    } else {
-                        mInsetsController.show(WindowInsetsCompat.Type.statusBars());
                     }
 
                     dragDropEnabled = true;
@@ -1391,21 +1405,69 @@ public class LauncherActivity extends AppCompatActivity
     }
 
     /**
-     * Hotseat stays visible on widgets and workspace pages. Only GreeLivePage
-     * hides it, with the dock sliding off-screen as that page comes into view.
+     * Hotseat is hidden on GreeLivePage (first) and the Bliss widgets page (last).
+     * It stays visible on GreePlusPage and workspace pages.
      */
     private void updateHotseatForPagePosition(float pagePos) {
-        float progress = pagePos - GREE_LIVE_PAGE;
-        if (progress >= 0.999f) {
-            progress = 1f;
-        }
-        if (progress <= 0.001f) {
-            progress = 0f;
-        }
+        float visibility = hotseatVisibility(pagePos);
         int dockHeight = mDock.getHeight() + mIndicator.getHeight();
-        float dockTranslationY = (1f - progress) * dockHeight;
+        float dockTranslationY = (1f - visibility) * dockHeight;
         mDock.setTranslationY(dockTranslationY);
         mIndicator.setTranslationY(dockTranslationY);
+    }
+
+    private float hotseatVisibility(float pagePos) {
+        float fromLive = clamp01(pagePos - GREE_LIVE_PAGE);
+        float toWidgets = 1f;
+        if (widgetsPage != null) {
+            toWidgets = clamp01(getWidgetPageIndex() - pagePos);
+        }
+        return Math.min(fromLive, toWidgets);
+    }
+
+    private float pageBlurAlpha(float pagePos) {
+        float liveBlur = clamp01(GREE_PLUS_PAGE - pagePos);
+        float widgetBlur = 0f;
+        if (widgetsPage != null) {
+            widgetBlur = clamp01(pagePos - (getWidgetPageIndex() - 1));
+        }
+        return Math.max(liveBlur, widgetBlur);
+    }
+
+    private boolean shouldBlurPage(int page) {
+        return page == GREE_LIVE_PAGE || isWidgetPage(page);
+    }
+
+    /**
+     * Navigation bar contrast is reduced on GreeLivePage and the widgets page.
+     * Status bar stays visible on all launcher pages.
+     */
+    private boolean shouldHideSystemChrome(int page) {
+        return page < WORKSPACE_PAGE_OFFSET || isWidgetPage(page);
+    }
+
+    private boolean isWidgetPage(int page) {
+        return widgetsPage != null && page == getWidgetPageIndex();
+    }
+
+    private int getWidgetPageIndex() {
+        if (widgetsPage != null) {
+            int index = mHorizontalPager.indexOfChild(widgetsPage);
+            if (index >= 0) {
+                return index;
+            }
+        }
+        return WORKSPACE_PAGE_OFFSET + (pages == null ? 0 : pages.size());
+    }
+
+    private float clamp01(float value) {
+        if (value <= 0.001f) {
+            return 0f;
+        }
+        if (value >= 0.999f) {
+            return 1f;
+        }
+        return value;
     }
 
     private ValueAnimator createNavbarColorAnimator() {
@@ -1428,6 +1490,9 @@ public class LauncherActivity extends AppCompatActivity
     public void refreshSuggestedApps(ViewGroup viewGroup, boolean forceRefresh) {
         TextView openUsageAccessSettingsTv = viewGroup.findViewById(R.id.openUsageAccessSettings);
         GridLayout suggestedAppsGridLayout = viewGroup.findViewById(R.id.suggestedAppGrid);
+        if (openUsageAccessSettingsTv == null || suggestedAppsGridLayout == null) {
+            return;
+        }
         AppUsageStats appUsageStats = new AppUsageStats(this);
         List<UsageStats> usageStats = appUsageStats.getUsageStats();
 
@@ -1527,6 +1592,30 @@ public class LauncherActivity extends AppCompatActivity
         return grid;
     }
 
+    private void createGreePlusPage() {
+        greePlusPage = new GreePlusPage(this);
+        mHorizontalPager.addView(greePlusPage, 0);
+        View.OnLayoutChangeListener clearanceListener = (v, l, t, r, b, ol, ot, or, ob) ->
+                syncGreePlusHotseatClearance();
+        mDock.addOnLayoutChangeListener(clearanceListener);
+        mIndicator.addOnLayoutChangeListener(clearanceListener);
+        mDock.post(this::syncGreePlusHotseatClearance);
+    }
+
+    private void syncGreePlusHotseatClearance() {
+        if (greePlusPage == null || mDock == null || mIndicator == null) {
+            return;
+        }
+        int clearance = mDock.getHeight() + mIndicator.getHeight();
+        int clearanceMargin = getResources().getConfiguration().smallestScreenWidthDp <= 320
+                ? (int) Utilities.pxFromDp(16, this)
+                : (int) Utilities.pxFromDp(8, this);
+        clearance += clearanceMargin;
+        if (clearance > clearanceMargin) {
+            greePlusPage.setHotseatClearance(clearance);
+        }
+    }
+
     private void createWidgetsPage() {
         widgetsPage = (InsettableFrameLayout) getLayoutInflater().inflate(R.layout.widgets_page, mHorizontalPager,
                 false);
@@ -1534,45 +1623,17 @@ public class LauncherActivity extends AppCompatActivity
         /*
          * widgetsPage.setPadding(0, (int) (Utilities.pxFromDp(8, this)), 0, 0);
          */
-        mHorizontalPager.addView(widgetsPage, 0);
+        mHorizontalPager.addView(widgetsPage);
         widgetsPage.setOnDragListener(null);
         ScrollView scrollView = widgetsPage.findViewById(R.id.widgets_scroll_container);
-        int hotseatReserve = mDeviceProfile.hotseatCellHeightPx + mDeviceProfile.getPageIndicatorHeight();
-        scrollView.setPadding(scrollView.getPaddingLeft(), scrollView.getPaddingTop(), scrollView.getPaddingRight(),
-                scrollView.getPaddingBottom() + hotseatReserve);
-        View widgetResizer = widgetsPage.findViewById(R.id.widget_resizer_container);
-        ViewGroup.MarginLayoutParams resizerLp = (ViewGroup.MarginLayoutParams) widgetResizer.getLayoutParams();
-        resizerLp.bottomMargin += hotseatReserve;
-        widgetResizer.setLayoutParams(resizerLp);
-        scrollView.setOnTouchListener((v, event) -> {
-            if (widgetsPage.findViewById(R.id.widget_resizer_container).getVisibility() == VISIBLE) {
-                hideWidgetResizeContainer();
-            }
-            return false;
-        });
+        setupWidgetPageLongPress(widgetsPage, scrollView);
 
-        widgetsPage.findViewById(R.id.used_apps_layout).setClipToOutline(true);
-
-        // Prepare app suggestions view
-        // [[BEGIN]]
-        widgetsPage.findViewById(R.id.openUsageAccessSettings)
-                .setOnClickListener(view -> startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)));
-
-        // divided by 2 because of left and right padding.
-        int padding = (int) (mDeviceProfile.availableWidthPx / 2 - Utilities.pxFromDp(8, this)
-                - 2 * mDeviceProfile.cellWidthPx);
-        widgetsPage.findViewById(R.id.suggestedAppGrid).setPadding(padding, 0, padding, 0);
-        // [[END]]
-
-        // Prepare search suggestion view
-        // [[BEGIN]]
+        mSearchInput = widgetsPage.findViewById(R.id.search_input);
         ImageView clearSuggestions = widgetsPage.findViewById(R.id.clearSuggestionImageView);
         clearSuggestions.setOnClickListener(v -> {
             mSearchInput.setText("");
             mSearchInput.clearFocus();
         });
-
-        mSearchInput = widgetsPage.findViewById(R.id.search_input);
         mSearchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -1589,30 +1650,13 @@ public class LauncherActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
-        RecyclerView suggestionRecyclerView = widgetsPage.findViewById(R.id.suggestionRecyclerView);
-        AutoCompleteAdapter suggestionAdapter = new AutoCompleteAdapter(this);
-        suggestionRecyclerView.setHasFixedSize(true);
-        suggestionRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        suggestionRecyclerView.setAdapter(suggestionAdapter);
-        getCompositeDisposable().add(RxTextView.textChanges(mSearchInput).debounce(300, TimeUnit.MILLISECONDS)
-                .map(CharSequence::toString).distinctUntilChanged().switchMap(charSequence -> {
-                    if (charSequence != null && charSequence.length() > 0) {
-                        return searchForQuery(charSequence);
-                    } else {
-                        return Observable.just(new SuggestionsResult(charSequence));
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SearchInputDisposableObserver(this, suggestionAdapter, widgetsPage)));
-
         mSearchInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 hideKeyboard(v);
             }
         });
-
         mSearchInput.setOnEditorActionListener((textView, action, keyEvent) -> {
             if (action == EditorInfo.IME_ACTION_SEARCH) {
                 hideKeyboard(mSearchInput);
@@ -1623,11 +1667,13 @@ public class LauncherActivity extends AppCompatActivity
             }
             return false;
         });
-        // [[END]]
 
-        // Prepare edit widgets button
-        findViewById(R.id.edit_widgets_button)
-                .setOnClickListener(view -> startActivity(new Intent(this, WidgetsActivity.class)));
+        View widgetEditBlank = widgetsPage.findViewById(R.id.widget_edit_blank);
+        widgetEditBlank.setMinimumHeight(mDeviceProfile.cellHeightPx);
+
+        View editWidgetsButton = widgetsPage.findViewById(R.id.edit_widgets_button);
+        editWidgetsButton.setOnClickListener(view -> openWidgetEditor());
+        setupWidgetEditFab(editWidgetsButton);
 
         if (WeatherUtils.isWeatherServiceAvailable(this)) {
             startService(new Intent(this, WeatherSourceListenerService.class));
@@ -1657,11 +1703,193 @@ public class LauncherActivity extends AppCompatActivity
         rebindWidgetHost();
     }
 
+    private void openWidgetEditor() {
+        startActivity(new Intent(this, WidgetsActivity.class));
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setupWidgetPageLongPress(View widgetsPage, ScrollView scrollView) {
+        View.OnLongClickListener openEditor = v -> {
+            if (isWidgetResizerVisible()) {
+                return false;
+            }
+            openWidgetEditor();
+            return true;
+        };
+        View content = widgetsPage.findViewById(R.id.widgets_page_content);
+        View dragLayer = widgetsPage.findViewById(R.id.drag_layer);
+        View widgetContainerView = widgetsPage.findViewById(R.id.widget_container);
+        View widgetEditBlank = widgetsPage.findViewById(R.id.widget_edit_blank);
+        if (content != null) {
+            content.setOnLongClickListener(openEditor);
+        }
+        if (dragLayer != null) {
+            dragLayer.setOnLongClickListener(openEditor);
+        }
+        if (widgetContainerView != null) {
+            widgetContainerView.setOnLongClickListener(openEditor);
+        }
+        if (widgetEditBlank != null) {
+            widgetEditBlank.setOnLongClickListener(openEditor);
+        }
+
+        GestureDetectorCompat detector = new GestureDetectorCompat(this,
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDown(MotionEvent e) {
+                        return true;
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        if (!isWidgetResizerVisible()) {
+                            openWidgetEditor();
+                        }
+                    }
+                });
+        scrollView.setOnTouchListener((v, event) -> {
+            if (isWidgetResizerVisible()) {
+                hideWidgetResizeContainer();
+            }
+            detector.onTouchEvent(event);
+            return false;
+        });
+    }
+
+    private boolean isWidgetResizerVisible() {
+        if (widgetsPage == null) {
+            return false;
+        }
+        View resizer = widgetsPage.findViewById(R.id.widget_resizer_container);
+        return resizer != null && resizer.getVisibility() == VISIBLE;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setupWidgetEditFab(View fab) {
+        final int touchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
+        fab.setTranslationY(Preferences.getWidgetFabTranslationY(this));
+        fab.post(() -> fab.setTranslationY(
+                clampWidgetFabTranslationY(fab, Preferences.getWidgetFabTranslationY(this))));
+        fab.addOnLayoutChangeListener(
+                (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> v.setTranslationY(
+                        clampWidgetFabTranslationY(v, v.getTranslationY())));
+
+        fab.setOnTouchListener(new View.OnTouchListener() {
+            private float downRawY;
+            private float downTranslationY;
+            private boolean dragging;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downRawY = event.getRawY();
+                        downTranslationY = v.getTranslationY();
+                        dragging = false;
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        return true;
+                    case MotionEvent.ACTION_MOVE: {
+                        float dy = event.getRawY() - downRawY;
+                        if (!dragging && Math.abs(dy) > touchSlop) {
+                            dragging = true;
+                            v.getParent().requestDisallowInterceptTouchEvent(true);
+                        }
+                        if (dragging) {
+                            v.setTranslationY(clampWidgetFabTranslationY(v, downTranslationY + dy));
+                        }
+                        return true;
+                    }
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        if (dragging) {
+                            Preferences.setWidgetFabTranslationY(LauncherActivity.this, v.getTranslationY());
+                            dragging = false;
+                            return true;
+                        }
+                        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+                            v.performClick();
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+    }
+
+    private float clampWidgetFabTranslationY(View fab, float translationY) {
+        View parent = (View) fab.getParent();
+        if (parent == null || parent.getHeight() == 0 || fab.getHeight() == 0) {
+            return translationY;
+        }
+        int padding = (int) Utilities.pxFromDp(8, this);
+        Rect insets = parent instanceof InsettableFrameLayout
+                ? ((InsettableFrameLayout) parent).getInsets()
+                : null;
+        int topBound = padding + (insets != null ? insets.top : 0);
+        int bottomBound = parent.getHeight() - padding - (insets != null ? insets.bottom : 0);
+        float min = topBound - fab.getTop();
+        float max = bottomBound - fab.getBottom();
+        if (max < min) {
+            return min;
+        }
+        return Math.max(min, Math.min(max, translationY));
+    }
+
     private void createGreeLivePage() {
         greeLivePage = new GreeLivePage(this);
         mHorizontalPager.addView(greeLivePage, GREE_LIVE_PAGE);
         currentPageNumber = WORKSPACE_PAGE_OFFSET;
         mHorizontalPager.setCurrentPage(currentPageNumber);
+        setupGreeSearch();
+        greeLivePage.setOnScanClickListener(v -> openGreeScanner());
+    }
+
+    private void setupGreeSearch() {
+        EditText searchInput = greeLivePage.getSearchInput();
+        ImageView clearSuggestions = greeLivePage.getSearchClear();
+        clearSuggestions.setOnClickListener(v -> {
+            searchInput.setText("");
+            greeLivePage.focusSearchInput();
+        });
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                clearSuggestions.setVisibility(s.toString().trim().length() > 0 ? VISIBLE : GONE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        searchInput.setOnEditorActionListener((textView, action, keyEvent) -> {
+            if (action == EditorInfo.IME_ACTION_SEARCH) {
+                String query = searchInput.getText() == null ? "" : searchInput.getText().toString().trim();
+                if (query.isEmpty()) {
+                    return true;
+                }
+                hideKeyboard(searchInput);
+                runSearch(query);
+                greeLivePage.clearSearch();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void openGreeScanner() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+            return;
+        }
+        startActivity(new Intent(this, GreeScanActivity.class));
     }
 
     private void rebindWidgetHost() {
@@ -1720,6 +1948,12 @@ public class LauncherActivity extends AppCompatActivity
         } else if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 BlurWallpaperProvider.Companion.getInstance(getApplicationContext()).updateAsync();
+            }
+        } else if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startActivity(new Intent(this, GreeScanActivity.class));
+            } else {
+                Toast.makeText(this, com.hive.gree.R.string.gree_scan_permission_denied, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -1848,10 +2082,14 @@ public class LauncherActivity extends AppCompatActivity
 
     @Override
     public void onClick(String suggestion) {
-        mSearchInput.setText(suggestion);
         runSearch(suggestion);
-        mSearchInput.clearFocus();
-        mSearchInput.setText("");
+        if (mSearchInput != null) {
+            mSearchInput.setText("");
+            mSearchInput.clearFocus();
+        }
+        if (greeLivePage != null) {
+            greeLivePage.clearSearch();
+        }
     }
 
     private void runSearch(String query) {
@@ -2452,8 +2690,9 @@ public class LauncherActivity extends AppCompatActivity
                                     getResources().getDimensionPixelSize(R.dimen.dotSize),
                                     getResources().getDimensionPixelSize(R.dimen.dotSize));
                             dot.setLayoutParams(params);
-                            mIndicator.addView(dot);
-                            mHorizontalPager.addView(layout);
+                            int insertAt = getWidgetPageIndex();
+                            mIndicator.addView(dot, insertAt);
+                            mHorizontalPager.addView(layout, insertAt);
                         }
                     } else if ((cX + mDeviceProfile.iconSizePx / 10) < 2 * scrollCorner) {
                         if (getCurrentAppsPageNumber() == 0) {
@@ -2928,7 +3167,8 @@ public class LauncherActivity extends AppCompatActivity
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mDeviceProfile.pageIndicatorSizePx,
                 mDeviceProfile.pageIndicatorSizePx);
 
-        for (int i = 0; i < pages.size() + WORKSPACE_PAGE_OFFSET; i++) {
+        int pageCount = mHorizontalPager.getChildCount();
+        for (int i = 0; i < pageCount; i++) {
             ImageView dot = new ImageView(this);
             dot.setImageDrawable(getDrawable(R.drawable.dot_off));
             dot.setLayoutParams(params);
@@ -3170,6 +3410,9 @@ public class LauncherActivity extends AppCompatActivity
         if (mSearchInput != null) {
             mSearchInput.setText("");
         }
+        if (greeLivePage != null) {
+            greeLivePage.clearSearch();
+        }
 
         if (swipeSearchContainer.getVisibility() == VISIBLE) {
             hideSwipeSearchContainer();
@@ -3365,6 +3608,9 @@ public class LauncherActivity extends AppCompatActivity
     }
 
     public void showWidgetResizeContainer(RoundedWidgetView roundedWidgetView) {
+        if (widgetsPage == null) {
+            return;
+        }
         RelativeLayout widgetResizeContainer = widgetsPage.findViewById(R.id.widget_resizer_container);
         if (widgetResizeContainer.getVisibility() != VISIBLE) {
             activeRoundedWidgetView = roundedWidgetView;
@@ -3455,6 +3701,9 @@ public class LauncherActivity extends AppCompatActivity
     }
 
     public void hideWidgetResizeContainer() {
+        if (widgetsPage == null) {
+            return;
+        }
         RelativeLayout widgetResizeContainer = widgetsPage.findViewById(R.id.widget_resizer_container);
         if (widgetResizeContainer.getVisibility() == VISIBLE) {
             if (currentAnimator != null) {
@@ -3546,6 +3795,7 @@ public class LauncherActivity extends AppCompatActivity
                 iconLayoutParams.height = mDeviceProfile.cellHeightPx;
                 iconLayoutParams.width = mDeviceProfile.cellWidthPx;
                 appView.findViewById(R.id.app_label).setVisibility(View.VISIBLE);
+                ((SquareFrameLayout) appView.findViewById(R.id.app_icon)).enableBlur();
                 appView.setLayoutParams(iconLayoutParams);
                 viewGroup.addView(appView);
                 i++;

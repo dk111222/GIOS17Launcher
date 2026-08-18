@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="@dimen/gree_page_h_padding"
-            android:paddingTop="52dp"
+            android:paddingTop="16dp"
             android:paddingEnd="@dimen/gree_page_h_padding">
 
             <!-- Top bar: search + scan + avatar -->
@@ -48,15 +48,31 @@
                         android:contentDescription="@null"
                         android:src="@drawable/ic_gree_search" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:id="@+id/gree_search_input"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@null"
                         android:ellipsize="end"
+                        android:hint="@string/gree_search_hint"
+                        android:imeOptions="actionSearch"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
                         android:maxLines="1"
-                        android:text="@string/gree_search_hint"
-                        android:textColor="@color/gree_neo_search_hint"
+                        android:textColor="@color/gree_neo_ink"
+                        android:textColorHint="@color/gree_neo_search_hint"
                         android:textSize="11.5sp" />
+
+                    <ImageView
+                        android:id="@+id/gree_search_clear"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="6dp"
+                        android:contentDescription="@string/gree_search_hint"
+                        android:src="@drawable/ic_gree_search_clear"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <ImageButton
@@ -65,7 +81,7 @@
                     android:layout_height="36dp"
                     android:layout_marginStart="9dp"
                     android:background="@drawable/gree_neo_icon_btn_bg"
-                    android:contentDescription="@string/gree_toast_demo"
+                    android:contentDescription="@string/gree_scan_title"
                     android:padding="9dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_gree_scan" />
@@ -173,7 +189,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -233,7 +249,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="17dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 

@@ -10,18 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
+        android:fillViewport="true"
         android:orientation="vertical"
         android:scrollbars="none"
         tools:ignore="ContentDescription">
 
         <com.cloudx.ios17.core.customviews.InsettableLinearLayout
+            android:id="@+id/widgets_page_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:padding="8dp">
 
-            <include layout="@layout/layout_search_suggestion" />
+            <include layout="@layout/layout_widgets_search" />
 
             <FrameLayout
                 android:id="@+id/drag_layer"
@@ -35,26 +37,35 @@
                     android:orientation="vertical" />
             </FrameLayout>
 
-            <Button
-                android:id="@+id/edit_widgets_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="60dp"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingLeft="24dp"
-                android:paddingTop="5dp"
-                android:paddingRight="24dp"
-                android:paddingBottom="5dp"
-                android:background="@drawable/btn_rounded_corner"
-                android:stateListAnimator="@null"
-                android:fontFamily="sans-serif-medium"
-                android:textAllCaps="false"
-                android:textColor="@color/on_surface_high_emphasis"
-                android:text="@string/edit" />
+            <View
+                android:id="@+id/widget_edit_blank"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:contentDescription="@string/edit"
+                android:focusable="true"
+                android:longClickable="true"
+                android:minHeight="80dp" />
         </com.cloudx.ios17.core.customviews.InsettableLinearLayout>
     </com.cloudx.ios17.core.customviews.InsettableScrollLayout>
+
+    <ImageButton
+        android:id="@+id/edit_widgets_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/btn_widget_edit_fab"
+        android:contentDescription="@string/edit"
+        android:elevation="8dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:outlineProvider="background"
+        android:padding="12dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_edit_white_24dp"
+        android:stateListAnimator="@null" />
 
     <RelativeLayout
         android:id="@+id/widget_resizer_container"

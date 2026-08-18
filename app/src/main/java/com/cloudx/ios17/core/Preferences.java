@@ -53,6 +53,7 @@ public class Preferences {
     private static final String ADDED_WEATHER_WIDGET = "added_weather_widget";
     private static final String ADDED_ECLOUD_WIDGET = "added_ecloud_widget";
     private static final String ADDED_PRIVACY_WIDGET = "added_privacy_widget";
+    private static final String WIDGET_FAB_TRANSLATION_Y = "widget_fab_translation_y";
 
     private static final String AP_MIGRATION_1 = "ap_migration_1";
 
@@ -406,5 +407,13 @@ public class Preferences {
 
     public static boolean getAddedPrivacyWidget(Context context) {
         return getPrefs(context).getBoolean(ADDED_PRIVACY_WIDGET, false);
+    }
+
+    public static float getWidgetFabTranslationY(Context context) {
+        return getPrefs(context).getFloat(WIDGET_FAB_TRANSLATION_Y, 0f);
+    }
+
+    public static void setWidgetFabTranslationY(Context context, float translationY) {
+        getPrefs(context).edit().putFloat(WIDGET_FAB_TRANSLATION_Y, translationY).apply();
     }
 }

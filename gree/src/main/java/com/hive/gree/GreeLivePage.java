@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -91,16 +94,60 @@ public class GreeLivePage extends FrameLayout {
     }
 
     private void bindTopBar() {
-        findViewById(R.id.gree_search_bar).setOnClickListener(
-                v -> toast(getContext().getString(R.string.gree_search_hint)));
-        findViewById(R.id.gree_scan_btn).setOnClickListener(
-                v -> toast("扫一扫"));
+        EditText searchInput = getSearchInput();
+        findViewById(R.id.gree_search_bar).setOnClickListener(v -> focusSearchInput());
+        searchInput.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                ViewParent parent = v.getParent();
+                while (parent != null) {
+                    parent.requestDisallowInterceptTouchEvent(true);
+                    parent = parent.getParent();
+                }
+            }
+            return false;
+        });
         findViewById(R.id.gree_avatar_btn).setOnClickListener(
                 v -> toast("个人中心"));
         findViewById(R.id.gree_all_devices_btn).setOnClickListener(
                 v -> toast("全部设备"));
         findViewById(R.id.gree_scene_settings_btn).setOnClickListener(
                 v -> toast("场景设置"));
+    }
+
+    public EditText getSearchInput() {
+        return findViewById(R.id.gree_search_input);
+    }
+
+    public ImageView getSearchClear() {
+        return findViewById(R.id.gree_search_clear);
+    }
+
+    public void setOnScanClickListener(OnClickListener listener) {
+        findViewById(R.id.gree_scan_btn).setOnClickListener(listener);
+    }
+
+    public void focusSearchInput() {
+        EditText input = getSearchInput();
+        if (input == null) {
+            return;
+        }
+        input.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    public void clearSearch() {
+        EditText input = getSearchInput();
+        if (input != null) {
+            input.setText("");
+            input.clearFocus();
+        }
+        ImageView clear = getSearchClear();
+        if (clear != null) {
+            clear.setVisibility(GONE);
+        }
     }
 
     private void bindScenes() {
