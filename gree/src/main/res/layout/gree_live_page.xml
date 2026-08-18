@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
@@ -72,10 +71,10 @@
                     android:src="@drawable/ic_gree_scan" />
 
                 <FrameLayout
+                    android:id="@+id/gree_avatar_wrap"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_marginStart="9dp"
-                    android:background="@drawable/gree_avatar_ring"
                     android:elevation="4dp">
 
                     <ImageView
@@ -85,9 +84,15 @@
                         android:clickable="true"
                         android:contentDescription="@string/gree_toast_demo"
                         android:focusable="true"
-                        android:padding="2dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/a_dad" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/gree_avatar_ring"
+                        android:clickable="false"
+                        android:focusable="false" />
                 </FrameLayout>
             </LinearLayout>
 

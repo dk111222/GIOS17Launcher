@@ -5,8 +5,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -19,6 +19,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /** Innovation-layout minus-one screen hosted by the gree module. */
 public class GreeLivePage extends FrameLayout {
@@ -82,8 +86,8 @@ public class GreeLivePage extends FrameLayout {
         bindBanner();
         bindGreeServices();
         bindPhoneServices();
-        ImageView avatar = findViewById(R.id.gree_avatar_btn);
-        GreeImageClip.clipCircle(avatar);
+        GreeImageClip.clipCircle(findViewById(R.id.gree_avatar_wrap));
+        GreeImageClip.clipCircle(findViewById(R.id.gree_avatar_btn));
     }
 
     private void bindTopBar() {
@@ -107,6 +111,7 @@ public class GreeLivePage extends FrameLayout {
                 new SceneCard(R.drawable.sc_movie, R.string.gree_scene_movie, R.string.gree_scene_movie_desc),
                 new SceneCard(R.drawable.sc_sleep, R.string.gree_scene_sleep, R.string.gree_scene_sleep_desc),
         };
+        View[] sceneViews = new View[scenes.length];
         addTwoColumnGrid(grid, scenes.length, (row, col) -> {
             int index = row * 2 + col;
             SceneCard scene = scenes[index];
@@ -116,8 +121,18 @@ public class GreeLivePage extends FrameLayout {
             GreeImageClip.clipRound(icon, dp(12));
             ((TextView) card.findViewById(R.id.scene_title)).setText(scene.titleRes);
             ((TextView) card.findViewById(R.id.scene_desc)).setText(scene.descRes);
-            String title = getContext().getString(scene.titleRes);
-            card.setOnClickListener(v -> toast(getContext().getString(R.string.gree_toast_scene, title)));
+            sceneViews[index] = card;
+            card.setOnClickListener(v -> {
+                boolean wasSelected = v.isSelected();
+                for (View other : sceneViews) {
+                    if (other != null) {
+                        other.setSelected(false);
+                    }
+                }
+                if (!wasSelected) {
+                    v.setSelected(true);
+                }
+            });
             return card;
         });
     }
@@ -177,28 +192,35 @@ public class GreeLivePage extends FrameLayout {
     private void bindGreeServices() {
         LinearLayout grid = findViewById(R.id.gree_services_grid);
         ServiceCard[] services = {
-                new ServiceCard(R.drawable.m_clean, R.string.gree_svc_clean_title, R.string.gree_svc_clean_desc),
-                new ServiceCard(R.drawable.lw_ac, R.string.gree_svc_trade_title, R.string.gree_svc_trade_desc),
-                new ServiceCard(R.drawable.m_ac, R.string.gree_svc_weather_title, R.string.gree_svc_weather_desc),
-                new ServiceCard(R.drawable.ai_energy, R.string.gree_svc_report_title, R.string.gree_svc_report_desc),
+                new ServiceCard(R.drawable.m_clean, R.string.gree_svc_clean_title, R.string.gree_svc_clean_desc, false),
+                new ServiceCard(R.drawable.lw_ac, R.string.gree_svc_trade_title, R.string.gree_svc_trade_desc, true),
+                new ServiceCard(R.drawable.m_ac, R.string.gree_svc_weather_title, R.string.gree_svc_weather_desc, false),
+                new ServiceCard(R.drawable.ai_energy, R.string.gree_svc_report_title, R.string.gree_svc_report_desc, false),
         };
         addTwoColumnGrid(grid, services.length, (row, col) -> {
             ServiceCard service = services[row * 2 + col];
             View card = inflateCard(R.layout.item_gree_service_card);
             ImageView icon = card.findViewById(R.id.service_icon);
+            if (service.fitContain) {
+                icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                icon.setPadding(dp(6), dp(6), dp(6), dp(6));
+                icon.setCropToPadding(true);
+            }
             icon.setImageResource(service.iconRes);
-            GreeImageClip.clipRound(icon, dp(14));
+            GreeImageClip.clipRound(icon, dp(12));
             ((TextView) card.findViewById(R.id.service_title)).setText(service.titleRes);
             ((TextView) card.findViewById(R.id.service_desc)).setText(service.descRes);
             String title = getContext().getString(service.titleRes);
             card.setOnClickListener(v -> toast(title));
             return card;
         });
+        equalizeGridCardHeights(grid);
     }
 
     private void bindPhoneServices() {
         LinearLayout container = findViewById(R.id.gree_phone_services);
         View weather = inflateCard(R.layout.item_gree_weather_card);
+        GreeImageClip.clipRound(weather, getResources().getDimension(R.dimen.gree_card_radius));
         weather.setOnClickListener(v -> toast("天气"));
         container.addView(wrapFullWidth(weather));
 
@@ -208,8 +230,10 @@ public class GreeLivePage extends FrameLayout {
                 new PhoneCard("#E0F2F4", "🚄", R.string.gree_phone_trip_title, R.string.gree_phone_trip_desc),
                 new PhoneCard("#F3EDFB", "📝", R.string.gree_phone_memo_title, R.string.gree_phone_memo_desc),
         };
+        View[] phoneCardViews = new View[cards.length];
         addTwoColumnGrid(container, cards.length, (row, col) -> {
-            PhoneCard cardData = cards[row * 2 + col];
+            int index = row * 2 + col;
+            PhoneCard cardData = cards[index];
             View card = inflateCard(R.layout.item_gree_phone_service);
             FrameLayout iconWrap = card.findViewById(R.id.phone_icon_wrap);
             GradientDrawable bg = new GradientDrawable();
@@ -224,19 +248,33 @@ public class GreeLivePage extends FrameLayout {
             ((TextView) card.findViewById(R.id.phone_desc)).setText(cardData.descRes);
             String title = getContext().getString(cardData.titleRes);
             card.setOnClickListener(v -> toast(title));
+            phoneCardViews[index] = card;
             return card;
         });
+        equalizeCardHeights(phoneCardViews);
 
         View news = inflateCard(R.layout.item_gree_news_card);
         ImageView newsImage = news.findViewById(R.id.news_image);
         GreeImageClip.clipRound(newsImage, dp(14));
         news.setOnClickListener(v -> toast("新闻速览"));
-        container.addView(wrapFullWidth(news));
+        container.addView(wrapFullWidth(news, 9));
     }
 
     private View wrapFullWidth(View child) {
+        return wrapFullWidth(child, 0);
+    }
+
+    private View wrapFullWidth(View child, int topMarginDp) {
+        int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        ViewGroup.LayoutParams existing = child.getLayoutParams();
+        if (existing != null && existing.height > 0) {
+            height = existing.height;
+        }
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, height);
+        if (topMarginDp > 0) {
+            lp.topMargin = dp(topMarginDp);
+        }
         lp.bottomMargin = dp(9);
         child.setLayoutParams(lp);
         return child;
@@ -264,7 +302,12 @@ public class GreeLivePage extends FrameLayout {
                     break;
                 }
                 View card = factory.create(row, col);
-                LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+                int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                ViewGroup.LayoutParams existing = card.getLayoutParams();
+                if (existing != null && existing.height > 0) {
+                    height = existing.height;
+                }
+                LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(0, height, 1f);
                 if (col == 0) {
                     cardLp.setMarginEnd(dp(9) / 2);
                 } else {
@@ -274,6 +317,50 @@ public class GreeLivePage extends FrameLayout {
                 rowLayout.addView(card);
             }
             container.addView(rowLayout);
+        }
+    }
+
+    private void equalizeGridCardHeights(LinearLayout grid) {
+        grid.post(() -> {
+            ArrayList<View> cards = new ArrayList<>();
+            for (int row = 0; row < grid.getChildCount(); row++) {
+                View child = grid.getChildAt(row);
+                if (!(child instanceof ViewGroup)) {
+                    continue;
+                }
+                ViewGroup rowLayout = (ViewGroup) child;
+                for (int col = 0; col < rowLayout.getChildCount(); col++) {
+                    cards.add(rowLayout.getChildAt(col));
+                }
+            }
+            applyEqualCardHeight(cards);
+        });
+    }
+
+    private void equalizeCardHeights(View[] cards) {
+        if (cards == null || cards.length == 0 || cards[0] == null) {
+            return;
+        }
+        cards[0].post(() -> applyEqualCardHeight(Arrays.asList(cards)));
+    }
+
+    private void applyEqualCardHeight(List<View> cards) {
+        int maxHeight = 0;
+        for (View card : cards) {
+            if (card != null) {
+                maxHeight = Math.max(maxHeight, card.getHeight());
+            }
+        }
+        if (maxHeight <= 0) {
+            return;
+        }
+        for (View card : cards) {
+            if (card == null) {
+                continue;
+            }
+            ViewGroup.LayoutParams lp = card.getLayoutParams();
+            lp.height = maxHeight;
+            card.setLayoutParams(lp);
         }
     }
 
@@ -311,11 +398,13 @@ public class GreeLivePage extends FrameLayout {
         final int iconRes;
         final int titleRes;
         final int descRes;
+        final boolean fitContain;
 
-        ServiceCard(int iconRes, int titleRes, int descRes) {
+        ServiceCard(int iconRes, int titleRes, int descRes, boolean fitContain) {
             this.iconRes = iconRes;
             this.titleRes = titleRes;
             this.descRes = descRes;
+            this.fitContain = fitContain;
         }
     }
 
@@ -380,14 +469,30 @@ public class GreeLivePage extends FrameLayout {
             holder.desc.setText(item.descRes);
             holder.btn.setText(item.btnRes);
             if (item.imageRes != 0) {
-                holder.image.setVisibility(VISIBLE);
+                holder.imageWrap.setVisibility(VISIBLE);
                 holder.image.setImageResource(item.imageRes);
+                GreeImageClip.clipRound(holder.imageWrap, dp(12));
                 GreeImageClip.clipRound(holder.image, dp(12));
             } else {
-                holder.image.setVisibility(GONE);
+                holder.imageWrap.setVisibility(GONE);
             }
-            holder.itemView.setOnClickListener(
-                    v -> toast(holder.title.getText().toString()));
+            View.OnClickListener go = v -> toast(holder.title.getText().toString());
+            holder.itemView.setOnClickListener(go);
+            holder.btn.setOnClickListener(go);
+            holder.btn.setOnTouchListener((v, event) -> {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(80).start();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(80).start();
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            });
         }
 
         @Override
@@ -400,6 +505,7 @@ public class GreeLivePage extends FrameLayout {
             final TextView title;
             final TextView desc;
             final TextView btn;
+            final View imageWrap;
             final ImageView image;
 
             Holder(@NonNull View itemView) {
@@ -408,6 +514,7 @@ public class GreeLivePage extends FrameLayout {
                 title = itemView.findViewById(R.id.banner_title);
                 desc = itemView.findViewById(R.id.banner_desc);
                 btn = itemView.findViewById(R.id.banner_btn);
+                imageWrap = itemView.findViewById(R.id.banner_image_wrap);
                 image = itemView.findViewById(R.id.banner_image);
             }
         }

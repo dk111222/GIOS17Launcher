@@ -519,6 +519,7 @@ public class LauncherActivity extends AppCompatActivity
         blurLayer.setAlpha(0f);
 
         mDock = mLauncherView.findViewById(R.id.dock);
+        mDock.setColumnCount(mDeviceProfile.numColumns);
         mIndicator = mLauncherView.findViewById(R.id.page_indicator);
         mFolderWindowContainer = mLauncherView.findViewById(R.id.folder_window_container);
         mFolderAppsViewPager = mLauncherView.findViewById(R.id.folder_apps);
@@ -1348,8 +1349,8 @@ public class LauncherActivity extends AppCompatActivity
                 float pagePos = (float) scrollX / mDeviceProfile.availableWidthPx;
                 updateHotseatForPagePosition(pagePos);
 
-                if (pagePos < WORKSPACE_PAGE_OFFSET) {
-                    float fraction = Math.min(1f, WORKSPACE_PAGE_OFFSET - pagePos);
+                if (pagePos < WIDGET_PAGE) {
+                    float fraction = Math.min(1f, WIDGET_PAGE - pagePos);
                     blurLayer.setAlpha(fraction);
                 }
                 if (isViewScrolling) {
@@ -1363,7 +1364,7 @@ public class LauncherActivity extends AppCompatActivity
                 updateHotseatForPagePosition(page);
 
                 blurLayer.setAlpha(
-                        (page < WORKSPACE_PAGE_OFFSET || mFolderWindowContainer.getVisibility() == VISIBLE) ? 1f : 0f);
+                        (page == GREE_LIVE_PAGE || mFolderWindowContainer.getVisibility() == VISIBLE) ? 1f : 0f);
 
                 if (currentPageNumber != page) {
                     int prevPage = currentPageNumber;
@@ -1515,6 +1516,7 @@ public class LauncherActivity extends AppCompatActivity
     private GridLayout preparePage() {
         GridLayout grid = (GridLayout) getLayoutInflater().inflate(R.layout.apps_page, null);
         grid.setRowCount(mDeviceProfile.numRows);
+        grid.setColumnCount(mDeviceProfile.numColumns);
         grid.setLayoutTransition(getDefaultLayoutTransition());
         grid.setPadding(mDeviceProfile.iconDrawablePaddingPx / 2, (int) (Utilities.pxFromDp(8, this)),
                 mDeviceProfile.iconDrawablePaddingPx / 2, 0);

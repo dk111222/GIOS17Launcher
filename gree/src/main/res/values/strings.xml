@@ -25,13 +25,13 @@
     <string name="gree_banner_tag_live">LIVE</string>
     <string name="gree_banner_1_title">格力除湿机 · 新品首发</string>
     <string name="gree_banner_1_desc">梅雨天也能干爽舒适 · 直降 300 元</string>
-    <string name="gree_banner_1_btn">去看看</string>
+    <string name="gree_banner_1_btn">去看看 ›</string>
     <string name="gree_banner_2_title">空调以旧换新季</string>
     <string name="gree_banner_2_desc">旧机至高补贴 800 元 · 新一级能效更省电</string>
-    <string name="gree_banner_2_btn">立即换新</string>
+    <string name="gree_banner_2_btn">立即换新 ›</string>
     <string name="gree_banner_3_title">董明珠店 · 直播中</string>
     <string name="gree_banner_3_desc">今晚 19:30 全屋智能专场 · 下单抽免单</string>
-    <string name="gree_banner_3_btn">进入直播间</string>
+    <string name="gree_banner_3_btn">进入直播间 ›</string>
 
     <string name="gree_svc_clean_title">清洗服务提醒</string>
     <string name="gree_svc_clean_desc">客厅空调累计运行 326 小时\n建议预约深度清洗</string>

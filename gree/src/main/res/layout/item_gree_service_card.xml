@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/gree_neo_card_bg"
     android:gravity="center_vertical"
+    android:minHeight="108dp"
     android:orientation="horizontal"
-    android:padding="14dp">
+    android:paddingStart="14dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="14dp"
+    android:paddingBottom="16dp">
 
     <ImageView
         android:id="@+id/service_icon"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="#F5F1E6"
         android:contentDescription="@null"
-        android:padding="5dp"
-        android:scaleType="fitCenter" />
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -26,26 +28,25 @@
 
         <TextView
             android:id="@+id/service_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
             android:textColor="@color/gree_neo_ink"
             android:textSize="12.5sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/service_desc"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
             android:lineSpacingExtra="2dp"
+            android:maxLines="4"
             android:textColor="@color/gree_neo_ink3"
             android:textSize="10sp" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="›"
-        android:textColor="#B0A892"
-        android:textSize="14sp" />
 </LinearLayout>

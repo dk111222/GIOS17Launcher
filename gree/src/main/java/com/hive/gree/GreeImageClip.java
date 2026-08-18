@@ -3,7 +3,6 @@ package com.hive.gree;
 import android.graphics.Outline;
 import android.view.View;
 import android.view.ViewOutlineProvider;
-import android.widget.ImageView;
 
 /** Clips image views to rounded or circular outlines without a Material theme. */
 final class GreeImageClip {
@@ -11,7 +10,7 @@ final class GreeImageClip {
     private GreeImageClip() {
     }
 
-    static void clipRound(ImageView view, float cornerRadiusPx) {
+    static void clipRound(View view, float cornerRadiusPx) {
         view.setClipToOutline(true);
         view.setOutlineProvider(new ViewOutlineProvider() {
             @Override
@@ -24,7 +23,7 @@ final class GreeImageClip {
         });
     }
 
-    static void clipCircle(ImageView view) {
+    static void clipCircle(View view) {
         view.setClipToOutline(true);
         view.setOutlineProvider(new ViewOutlineProvider() {
             @Override

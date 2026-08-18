@@ -182,7 +182,10 @@ public class DeviceProfile {
         pageIndicatorTopPaddingPx = Utilities.pxFromDp(8, dm);
         pageIndicatorBottomPaddingPx = Utilities.pxFromDp(8, dm);
 
-        numColumns = 4;
+        // 320dp-wide devices use a 4x3 apps-page grid; others use 5x4.
+        boolean compactScreen = res.getConfiguration().smallestScreenWidthDp <= 320;
+        numColumns = compactScreen ? 3 : 4;
+        numRows = compactScreen ? 4 : 5;
         numFolderColumns = 3;
         numHotseatIcons = numColumns;
         numFolderRows = numFolderColumns;
@@ -242,7 +245,7 @@ public class DeviceProfile {
 
         iconSizePx = (int) (0.75 * widthPx / widthCm * iconScale);
         iconTextSizePx = (int) (Utilities.pxFromSp(12, dm) * scale);
-        iconDrawablePaddingPx = (availableWidthPx - iconSizePx * 4) / 5;
+        iconDrawablePaddingPx = (availableWidthPx - iconSizePx * numColumns) / (numColumns + 1);
 
         int tempUninstallIconSize = iconSizePx * 72 / 192;
         uninstallIconSizePx = (tempUninstallIconSize > iconDrawablePaddingPx)
@@ -270,9 +273,6 @@ public class DeviceProfile {
         // Hotseat
         hotseatCellHeightWithoutPaddingPx = iconSizePx;
         hotseatCellHeightPx = hotseatCellHeightWithoutPaddingPx + iconDrawablePaddingPx;
-
-        numRows = (availableHeightPx - Utilities.pxFromDp(8, dm) - pageIndicatorTopPaddingPx
-                - pageIndicatorBottomPaddingPx - pageIndicatorSizePx - hotseatCellHeightPx) / cellHeightPx;
 
         maxAppsPerPage = numColumns * numRows;
 
