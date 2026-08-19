@@ -103,6 +103,7 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         float cornerRadius = getResources().getDimension(R.dimen.gree_scene_quick_btn_radius);
         LayoutInflater inflater = LayoutInflater.from(this);
         View[] sceneViews = new View[scenes.size()];
+        String[] sceneIds = new String[scenes.size()];
         for (int i = 0; i < scenes.size(); i++) {
             GreeSceneCatalog.SceneItem scene = scenes.get(i);
             View card = inflater.inflate(R.layout.item_gree_scene_quick_btn, sceneRow, false);
@@ -113,16 +114,10 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
             GreeImageClip.clipRound(card, cornerRadius);
             String sceneName = getString(scene.titleRes);
             sceneViews[i] = card;
+            sceneIds[i] = scene.id;
             card.setOnClickListener(v -> {
-                boolean wasSelected = v.isSelected();
-                for (View other : sceneViews) {
-                    if (other != null) {
-                        other.setSelected(false);
-                    }
-                }
-                if (!wasSelected) {
-                    v.setSelected(true);
-                }
+                GreeSceneSelection.toggleSceneSelection(this, scene.id);
+                GreeSceneSelection.applySelection(this, sceneViews, sceneIds);
                 v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(120).withEndAction(() ->
                         v.animate().scaleX(1f).scaleY(1f).setDuration(100).start()).start();
                 Toast.makeText(this, getString(R.string.gree_toast_scene, sceneName),
@@ -134,6 +129,7 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
             }
             sceneRow.addView(card, params);
         }
+        GreeSceneSelection.applySelection(this, sceneViews, sceneIds);
     }
 
     private void setupTransparentStatusBar() {

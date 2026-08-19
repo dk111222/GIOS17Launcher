@@ -89,6 +89,14 @@ public class GreeLivePage extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility == VISIBLE) {
+            refreshScenes();
+        }
+    }
+
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.gree_live_page, this, true);
         setClickable(true);
@@ -180,6 +188,7 @@ public class GreeLivePage extends FrameLayout {
         }
 
         View[] sceneViews = new View[scenes.size()];
+        String[] sceneIds = new String[scenes.size()];
         addTwoColumnGrid(grid, scenes.size(), (row, col) -> {
             int index = row * 2 + col;
             GreeSceneCatalog.SceneItem scene = scenes.get(index);
@@ -190,19 +199,14 @@ public class GreeLivePage extends FrameLayout {
             ((TextView) card.findViewById(R.id.scene_title)).setText(scene.titleRes);
             ((TextView) card.findViewById(R.id.scene_desc)).setText(scene.descRes);
             sceneViews[index] = card;
+            sceneIds[index] = scene.id;
             card.setOnClickListener(v -> {
-                boolean wasSelected = v.isSelected();
-                for (View other : sceneViews) {
-                    if (other != null) {
-                        other.setSelected(false);
-                    }
-                }
-                if (!wasSelected) {
-                    v.setSelected(true);
-                }
+                GreeSceneSelection.toggleSceneSelection(getContext(), scene.id);
+                GreeSceneSelection.applySelection(getContext(), sceneViews, sceneIds);
             });
             return card;
         });
+        GreeSceneSelection.applySelection(getContext(), sceneViews, sceneIds);
         equalizeGridCardHeights(grid);
     }
 
