@@ -122,7 +122,7 @@ public class GreeLivePage extends FrameLayout {
         findViewById(R.id.gree_all_devices_btn).setOnClickListener(
                 v -> getContext().startActivity(new Intent(getContext(), GreeAllDevicesActivity.class)));
         findViewById(R.id.gree_scene_settings_btn).setOnClickListener(
-                v -> toast("场景设置"));
+                v -> GreeSceneSettingsDialog.show(getContext(), this::refreshScenes));
     }
 
     public EditText getSearchInput() {
@@ -162,17 +162,27 @@ public class GreeLivePage extends FrameLayout {
     }
 
     private void bindScenes() {
+        refreshScenes();
+    }
+
+    private void refreshScenes() {
+        List<GreeSceneCatalog.SceneItem> scenes = GreeSceneCatalog.getEnabledScenes(getContext());
+        TextView subtitle = findViewById(R.id.gree_section_scenes_sub);
+        if (subtitle != null) {
+            subtitle.setText(getContext().getString(
+                    R.string.gree_section_scenes_sub_format, scenes.size()));
+        }
+
         LinearLayout grid = findViewById(R.id.gree_scenes_grid);
-        SceneCard[] scenes = {
-                new SceneCard(R.drawable.sc_home, R.string.gree_scene_home, R.string.gree_scene_home_desc),
-                new SceneCard(R.drawable.sc_away, R.string.gree_scene_away, R.string.gree_scene_away_desc),
-                new SceneCard(R.drawable.sc_movie, R.string.gree_scene_movie, R.string.gree_scene_movie_desc),
-                new SceneCard(R.drawable.sc_sleep, R.string.gree_scene_sleep, R.string.gree_scene_sleep_desc),
-        };
-        View[] sceneViews = new View[scenes.length];
-        addTwoColumnGrid(grid, scenes.length, (row, col) -> {
+        grid.removeAllViews();
+        if (scenes.isEmpty()) {
+            return;
+        }
+
+        View[] sceneViews = new View[scenes.size()];
+        addTwoColumnGrid(grid, scenes.size(), (row, col) -> {
             int index = row * 2 + col;
-            SceneCard scene = scenes[index];
+            GreeSceneCatalog.SceneItem scene = scenes.get(index);
             View card = inflateCard(R.layout.item_gree_scene_card);
             ImageView icon = card.findViewById(R.id.scene_icon);
             icon.setImageResource(scene.iconRes);
@@ -193,6 +203,7 @@ public class GreeLivePage extends FrameLayout {
             });
             return card;
         });
+        equalizeGridCardHeights(grid);
     }
 
     private void bindBanner() {
@@ -622,18 +633,6 @@ public class GreeLivePage extends FrameLayout {
 
     private int parseColorSafe(String color) {
         return android.graphics.Color.parseColor(color);
-    }
-
-    private static final class SceneCard {
-        final int iconRes;
-        final int titleRes;
-        final int descRes;
-
-        SceneCard(int iconRes, int titleRes, int descRes) {
-            this.iconRes = iconRes;
-            this.titleRes = titleRes;
-            this.descRes = descRes;
-        }
     }
 
     private static final class ServiceCard {

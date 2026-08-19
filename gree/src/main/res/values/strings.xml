@@ -23,6 +23,15 @@
     <string name="gree_scene_movie_desc">灯光渐暗 · 氛围就绪</string>
     <string name="gree_scene_sleep">睡眠模式</string>
     <string name="gree_scene_sleep_desc">主卧 27° · 灯光关闭</string>
+    <string name="gree_scene_guest">会客模式</string>
+    <string name="gree_scene_guest_desc">客厅明亮 · 窗帘全开</string>
+    <string name="gree_scene_eco">节能模式</string>
+    <string name="gree_scene_eco_desc">无人房间自动节能</string>
+    <string name="gree_scene_settings_title">负一屏场景设置</string>
+    <string name="gree_scene_settings_desc">选择负一屏展示的场景（最多 4 个），关闭后不再占用负一屏篇幅。</string>
+    <string name="gree_scene_settings_max">最多展示 4 个场景</string>
+    <string name="gree_scene_settings_min">至少保留 1 个场景</string>
+    <string name="gree_section_scenes_sub_format">%1$d 个 · 一键执行</string>
 
     <string name="gree_banner_tag_new">新品</string>
     <string name="gree_banner_tag_sale">优惠</string>

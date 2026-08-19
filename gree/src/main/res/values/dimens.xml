@@ -57,4 +57,18 @@
     <dimen name="gree_plus_env_radius">24dp</dimen>
     <dimen name="gree_plus_duo_radius">20dp</dimen>
     <dimen name="gree_plus_dev_radius">22dp</dimen>
+
+    <!-- scene-bar / scene-btn from design0811 -->
+    <dimen name="gree_scene_quick_footer_padding_top">11dp</dimen>
+    <dimen name="gree_scene_quick_footer_padding_h">14dp</dimen>
+    <dimen name="gree_scene_quick_footer_padding_bottom">16dp</dimen>
+    <dimen name="gree_scene_quick_title_margin_bottom">8dp</dimen>
+    <dimen name="gree_scene_quick_btn_width">122dp</dimen>
+    <dimen name="gree_scene_quick_btn_height">66dp</dimen>
+    <dimen name="gree_scene_quick_btn_radius">16dp</dimen>
+    <dimen name="gree_scene_quick_btn_gap">8dp</dimen>
+    <dimen name="gree_scene_quick_btn_text_padding_h">11dp</dimen>
+    <dimen name="gree_scene_quick_btn_text_padding_v">9dp</dimen>
+    <dimen name="gree_scene_quick_btn_text_size">12.5sp</dimen>
+    <dimen name="gree_scene_quick_title_size">11.5sp</dimen>
 </resources>

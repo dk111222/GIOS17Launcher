@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/gree_scene_quick_btn_width"
+    android:layout_height="@dimen/gree_scene_quick_btn_height"
+    android:clipToOutline="true"
+    android:elevation="3dp"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/scene_quick_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gree_scene_quick_overlay" />
+
+    <TextView
+        android:id="@+id/scene_quick_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="@dimen/gree_scene_quick_btn_text_padding_h"
+        android:paddingTop="@dimen/gree_scene_quick_btn_text_padding_v"
+        android:paddingEnd="@dimen/gree_scene_quick_btn_text_padding_h"
+        android:paddingBottom="@dimen/gree_scene_quick_btn_text_padding_v"
+        android:shadowColor="#66000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="4"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/gree_scene_quick_btn_text_size"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gree_scene_quick_selected_ring"
+        android:clickable="false"
+        android:duplicateParentState="true"
+        android:focusable="false" />
+</FrameLayout>

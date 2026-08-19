@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -43,6 +44,7 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
     private TextView titleView;
     private TextView extraView;
     private LinearLayout roomChipRow;
+    private LinearLayout sceneRow;
     private RoomContentAdapter adapter;
 
     private String currentRoom = GreeDeviceCatalog.ROOM_ALL;
@@ -56,6 +58,7 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         titleView = findViewById(R.id.gree_all_devices_title);
         extraView = findViewById(R.id.gree_all_devices_extra);
         roomChipRow = findViewById(R.id.gree_all_devices_room_chips);
+        sceneRow = findViewById(R.id.gree_all_devices_scene_row);
 
         for (GreeDeviceCatalog.FullDevice device : GreeDeviceCatalog.getAllFullDevices()) {
             powerStates.put(device.id, device.defaultOn);
@@ -84,10 +87,53 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         });
 
         bindRoomChips();
+        bindSceneQuickControls();
         refreshRows();
         updateHeader();
 
         findViewById(R.id.gree_all_devices_back).setOnClickListener(v -> finish());
+    }
+
+    private void bindSceneQuickControls() {
+        sceneRow.removeAllViews();
+        List<GreeSceneCatalog.SceneItem> scenes = GreeSceneCatalog.getAllScenes();
+        int margin = (int) getResources().getDimension(R.dimen.gree_scene_quick_btn_gap);
+        int btnWidth = (int) getResources().getDimension(R.dimen.gree_scene_quick_btn_width);
+        int btnHeight = (int) getResources().getDimension(R.dimen.gree_scene_quick_btn_height);
+        float cornerRadius = getResources().getDimension(R.dimen.gree_scene_quick_btn_radius);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View[] sceneViews = new View[scenes.size()];
+        for (int i = 0; i < scenes.size(); i++) {
+            GreeSceneCatalog.SceneItem scene = scenes.get(i);
+            View card = inflater.inflate(R.layout.item_gree_scene_quick_btn, sceneRow, false);
+            ImageView image = card.findViewById(R.id.scene_quick_image);
+            TextView title = card.findViewById(R.id.scene_quick_title);
+            image.setImageResource(scene.iconRes);
+            title.setText(scene.titleRes);
+            GreeImageClip.clipRound(card, cornerRadius);
+            String sceneName = getString(scene.titleRes);
+            sceneViews[i] = card;
+            card.setOnClickListener(v -> {
+                boolean wasSelected = v.isSelected();
+                for (View other : sceneViews) {
+                    if (other != null) {
+                        other.setSelected(false);
+                    }
+                }
+                if (!wasSelected) {
+                    v.setSelected(true);
+                }
+                v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(120).withEndAction(() ->
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(100).start()).start();
+                Toast.makeText(this, getString(R.string.gree_toast_scene, sceneName),
+                        Toast.LENGTH_SHORT).show();
+            });
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(btnWidth, btnHeight);
+            if (sceneRow.getChildCount() > 0) {
+                params.setMarginStart(margin);
+            }
+            sceneRow.addView(card, params);
+        }
     }
 
     private void setupTransparentStatusBar() {
