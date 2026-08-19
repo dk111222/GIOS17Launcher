@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Tall-card layout for sw >= 480: title top, status block bottom -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/gree_plus_dev_height"
     android:background="@drawable/gree_plus_dev_bg"
+    android:clickable="true"
     android:clipChildren="true"
     android:clipToPadding="true"
-    android:clickable="true"
     android:focusable="true">
 
     <ImageView
@@ -75,11 +76,15 @@
                 android:textSize="@dimen/gree_plus_dev_room_size" />
         </LinearLayout>
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
         <TextView
             android:id="@+id/dev_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/gree_plus_dev_value_margin_top"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"

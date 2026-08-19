@@ -1599,6 +1599,7 @@ public class LauncherActivity extends AppCompatActivity
                 syncGreePlusHotseatClearance();
         mDock.addOnLayoutChangeListener(clearanceListener);
         mIndicator.addOnLayoutChangeListener(clearanceListener);
+        greePlusPage.addOnLayoutChangeListener(clearanceListener);
         mDock.post(this::syncGreePlusHotseatClearance);
     }
 
@@ -1606,12 +1607,26 @@ public class LauncherActivity extends AppCompatActivity
         if (greePlusPage == null || mDock == null || mIndicator == null) {
             return;
         }
-        int clearance = mDock.getHeight() + mIndicator.getHeight();
-        int clearanceMargin = getResources().getConfiguration().smallestScreenWidthDp <= 320
-                ? (int) Utilities.pxFromDp(16, this)
-                : (int) Utilities.pxFromDp(8, this);
-        clearance += clearanceMargin;
-        if (clearance > clearanceMargin) {
+        // Clear everything from indicator top downward (indicator + dock).
+        int fromHeights = mDock.getHeight() + mIndicator.getHeight();
+        int fromLocation = fromHeights;
+        if (greePlusPage.getHeight() > 0) {
+            int[] pageLoc = new int[2];
+            greePlusPage.getLocationInWindow(pageLoc);
+            int pageBottom = pageLoc[1] + greePlusPage.getHeight();
+            int[] indicatorLoc = new int[2];
+            mIndicator.getLocationInWindow(indicatorLoc);
+            if (mIndicator.getHeight() > 0) {
+                fromLocation = Math.max(0, pageBottom - indicatorLoc[1]);
+            } else if (mDock.getHeight() > 0) {
+                int[] dockLoc = new int[2];
+                mDock.getLocationInWindow(dockLoc);
+                fromLocation = Math.max(0, pageBottom - dockLoc[1]);
+            }
+        }
+        int clearance = Math.max(fromHeights, fromLocation)
+                + getResources().getDimensionPixelSize(com.hive.gree.R.dimen.gree_plus_hotseat_extra);
+        if (clearance > 0) {
             greePlusPage.setHotseatClearance(clearance);
         }
     }

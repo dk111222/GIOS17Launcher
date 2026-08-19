@@ -141,11 +141,30 @@ public class GreePlusPage extends FrameLayout {
 
     public void setHotseatClearance(int pixels) {
         View scroll = findViewById(R.id.gree_plus_scroll);
-        if (scroll == null || pixels < 0 || scroll.getPaddingBottom() == pixels) {
+        if (scroll == null || pixels < 0) {
+            return;
+        }
+        int minClearance = getResources().getDimensionPixelSize(R.dimen.gree_plus_scroll_padding_bottom);
+        int bottom = Math.max(pixels, minClearance);
+        if (scroll.getPaddingBottom() == bottom) {
             return;
         }
         scroll.setPadding(scroll.getPaddingLeft(), scroll.getPaddingTop(),
-                scroll.getPaddingRight(), pixels);
+                scroll.getPaddingRight(), bottom);
+        // Keep last cards fully above indicator after padding changes.
+        scroll.post(() -> {
+            if (scroll instanceof androidx.core.widget.NestedScrollView) {
+                androidx.core.widget.NestedScrollView nsv =
+                        (androidx.core.widget.NestedScrollView) scroll;
+                int range = nsv.getChildCount() > 0
+                        ? Math.max(0, nsv.getChildAt(0).getHeight() - nsv.getHeight()
+                        + nsv.getPaddingBottom())
+                        : 0;
+                if (nsv.getScrollY() > range) {
+                    nsv.scrollTo(0, range);
+                }
+            }
+        });
     }
 
     private void bindHome() {
@@ -201,12 +220,12 @@ public class GreePlusPage extends FrameLayout {
         } else {
             card.findViewById(R.id.dev_bar_fill).setBackgroundResource(R.drawable.gree_plus_bar_wash);
         }
-        card.post(() -> applyDeviceCardLayout(card, item.showProgress));
+        card.post(() -> applyDeviceCardLayout(card, item));
         card.setOnClickListener(v -> toast(getContext().getString(item.titleRes)));
         GreeImageClip.clipRound(card, getResources().getDimension(R.dimen.gree_plus_dev_radius));
     }
 
-    private void applyDeviceCardLayout(View card, boolean showProgress) {
+    private void applyDeviceCardLayout(View card, GreeDeviceCatalog.DeviceItem item) {
         int cardWidth = card.getWidth();
         int cardHeight = card.getHeight();
         if (cardWidth <= 0 || cardHeight <= 0) {
@@ -214,17 +233,21 @@ public class GreePlusPage extends FrameLayout {
         }
         ImageView image = card.findViewById(R.id.dev_image);
         int maxImageWidth = cardWidth / 4;
-        int topMargin = getResources().getDimensionPixelSize(R.dimen.gree_plus_dev_image_margin_top);
+        int endMargin = getResources().getDimensionPixelSize(R.dimen.gree_plus_dev_image_margin_end);
         int bottomMargin = getResources().getDimensionPixelSize(R.dimen.gree_plus_dev_image_margin_bottom);
-        int maxImageHeight = Math.max(0, cardHeight - topMargin - bottomMargin);
+        int maxImageHeight = Math.max(dp(40), (int) (cardHeight * 0.72f));
+        if ("dehum".equals(item.id) || "water".equals(item.id)) {
+            maxImageWidth = maxImageWidth * 2 / 3;
+            maxImageHeight = maxImageHeight * 2 / 3;
+        }
         image.setMaxWidth(maxImageWidth);
         image.setMaxHeight(maxImageHeight);
         android.widget.FrameLayout.LayoutParams imageLp =
                 (android.widget.FrameLayout.LayoutParams) image.getLayoutParams();
         imageLp.width = android.widget.FrameLayout.LayoutParams.WRAP_CONTENT;
         imageLp.height = android.widget.FrameLayout.LayoutParams.WRAP_CONTENT;
-        imageLp.gravity = Gravity.TOP | Gravity.END;
-        imageLp.setMargins(0, topMargin, dp(4), 0);
+        imageLp.gravity = Gravity.BOTTOM | Gravity.END;
+        imageLp.setMargins(0, 0, endMargin, bottomMargin);
         image.setLayoutParams(imageLp);
 
         View content = card.findViewById(R.id.gree_plus_dev_content);
@@ -234,7 +257,7 @@ public class GreePlusPage extends FrameLayout {
                     content.getPaddingBottom());
         }
 
-        if (showProgress) {
+        if (item.showProgress) {
             View bar = card.findViewById(R.id.dev_bar);
             int barWidth = cardWidth / 2;
             android.widget.FrameLayout.LayoutParams barLp =
@@ -242,6 +265,7 @@ public class GreePlusPage extends FrameLayout {
             barLp.width = barWidth;
             barLp.leftMargin = dp(12);
             barLp.rightMargin = 0;
+            barLp.bottomMargin = getResources().getDimensionPixelSize(R.dimen.gree_plus_dev_bar_margin_bottom);
             bar.setLayoutParams(barLp);
         }
     }
