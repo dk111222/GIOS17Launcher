@@ -489,6 +489,8 @@ public class LauncherActivity extends AppCompatActivity
 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
+        // Keep system navigation bar background fully transparent (immersive mode).
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
         if (ThemesKt.isWorkspaceDarkText(this)) {
             int flags = mLauncherView.getSystemUiVisibility();
             flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
@@ -500,6 +502,8 @@ public class LauncherActivity extends AppCompatActivity
 
         mInsetsController = new WindowInsetsControllerCompat(getWindow(), mLauncherView);
         mInsetsController.show(WindowInsetsCompat.Type.statusBars());
+        // Enable immersive: hide navigation bars.
+        mInsetsController.hide(WindowInsetsCompat.Type.navigationBars());
     }
 
     public void registerUnlockBroadcastReceiver() {
@@ -545,7 +549,8 @@ public class LauncherActivity extends AppCompatActivity
         wobbleAnimation = AnimationUtils.loadAnimation(this, R.anim.wobble);
         wobbleReverseAnimation = AnimationUtils.loadAnimation(this, R.anim.wobble_reverse);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         workspace.setOnClickListener(v -> {
             if (swipeSearchContainer.getVisibility() == VISIBLE) {
                 hideSwipeSearchContainer();
@@ -1471,9 +1476,10 @@ public class LauncherActivity extends AppCompatActivity
     }
 
     private ValueAnimator createNavbarColorAnimator() {
+        // Keep navbar fully transparent; just animate to transparent for consistency.
         int navColor = getWindow().getNavigationBarColor();
         ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), navColor,
-                ColorUtils.setAlphaComponent(navColor, 160));
+                Color.TRANSPARENT);
 
         colorAnimation.setDuration(400);
         colorAnimation.setInterpolator(new LinearInterpolator());
@@ -3413,7 +3419,7 @@ public class LauncherActivity extends AppCompatActivity
             mDock.setAlpha(1f);
             mIndicator.setVisibility(VISIBLE);
             mIndicator.setAlpha(1f);
-            mHorizontalPager.snapToPage(WORKSPACE_PAGE_OFFSET);
+            mHorizontalPager.snapToPage(GREE_PLUS_PAGE);
         }
     }
 
@@ -3437,6 +3443,20 @@ public class LauncherActivity extends AppCompatActivity
             handleWobbling(false);
         } else if (mFolderWindowContainer.getVisibility() == View.VISIBLE) {
             hideFolderWindowContainer();
+        }
+
+        if (mHorizontalPager != null) {
+            mHorizontalPager.setVisibility(VISIBLE);
+            mHorizontalPager.setAlpha(1f);
+            mHorizontalPager.snapToPage(GREE_PLUS_PAGE);
+        }
+        if (mDock != null) {
+            mDock.setVisibility(VISIBLE);
+            mDock.setAlpha(1f);
+        }
+        if (mIndicator != null) {
+            mIndicator.setVisibility(VISIBLE);
+            mIndicator.setAlpha(1f);
         }
     }
 

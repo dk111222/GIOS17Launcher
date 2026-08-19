@@ -47,7 +47,18 @@
     <string name="gree_svc_report_desc">本周用电 86.4 度 · 省 8%\n用水 3.2 吨 · 食材告急 2 种</string>
 
     <string name="gree_phone_weather_title">珠海 · 多云 31°</string>
-    <string name="gree_phone_weather_desc">湿度 82% · 东南风 3 级 · 傍晚转晴\n15:00 32° · 17:00 31° · 19:00 29°</string>
+    <string name="gree_phone_weather_subtitle">湿度 82% · 东南风 3 级 · 未来 5 天</string>
+    <string name="gree_weather_day_today">今天</string>
+    <string name="gree_weather_day_thu">周四</string>
+    <string name="gree_weather_day_fri">周五</string>
+    <string name="gree_weather_day_sat">周六</string>
+    <string name="gree_weather_day_sun">周日</string>
+    <string name="gree_weather_cond_1">多云转阵雨</string>
+    <string name="gree_weather_cond_2">阵雨</string>
+    <string name="gree_weather_cond_3">多云</string>
+    <string name="gree_weather_cond_4">晴</string>
+    <string name="gree_weather_cond_5">晴</string>
+    <string name="gree_weather_temp_range">%1$d° / %2$d°</string>
     <string name="gree_phone_cal_title">明天 9:00 项目评审会</string>
     <string name="gree_phone_cal_desc">今天 18:00 接孩子 · 20:00 与妈妈视频</string>
     <string name="gree_phone_exp_title">快递 1 个待取</string>
@@ -61,6 +72,70 @@
 
     <string name="gree_toast_scene">已执行「%1$s」场景</string>
     <string name="gree_toast_demo">演示环境：%1$s</string>
+
+    <string name="gree_profile_title">我的</string>
+    <string name="gree_profile_name">张明</string>
+    <string name="gree_profile_account_line1">格力家庭账号 · 户主</string>
+    <string name="gree_profile_account_line2">家庭组「%1$s」</string>
+    <string name="gree_profile_intro_title">个人简介</string>
+    <string name="gree_profile_level_label">账号等级</string>
+    <string name="gree_profile_level_value">V6 尊享会员</string>
+    <string name="gree_profile_devices_label">绑定设备</string>
+    <string name="gree_profile_devices_value">%1$d 台</string>
+    <string name="gree_profile_points_label">家庭积分</string>
+    <string name="gree_profile_points_value">12,860 分</string>
+    <string name="gree_profile_join_label">注册时间</string>
+    <string name="gree_profile_join_value">2019 年 8 月</string>
+    <string name="gree_profile_family_title">家庭成员（%1$d）</string>
+
+    <string name="gree_profile_name_dad">张明</string>
+    <string name="gree_profile_role_dad">爸爸 · 户主</string>
+    <string name="gree_profile_desc_dad">38 岁，格力家庭账号管理员，负责全屋设备配网与场景设置。</string>
+    <string name="gree_profile_name_mom">李婷</string>
+    <string name="gree_profile_role_mom">妈妈</string>
+    <string name="gree_profile_desc_mom">36 岁，常用功能：私人衣橱、营养管家菜谱推荐。</string>
+    <string name="gree_profile_name_grandpa">张建国</string>
+    <string name="gree_profile_role_grandpa">爷爷</string>
+    <string name="gree_profile_desc_grandpa">65 岁，已开启长辈关怀模式，字体放大、语音播报提醒。</string>
+    <string name="gree_profile_name_girl">张笑笑</string>
+    <string name="gree_profile_role_girl">女儿</string>
+    <string name="gree_profile_desc_girl">7 岁，儿童房设备独立管理，22:00 后空调自动调至 27°C 睡眠模式。</string>
+
+    <string name="gree_profile_loc_dad">家中 · 明珠花园 3 栋</string>
+    <string name="gree_profile_loc_mom">公司 · 格力科技园（围栏外 2.3km）</string>
+    <string name="gree_profile_loc_grandpa">小区花园 · 散步中（围栏内）</string>
+    <string name="gree_profile_loc_girl">学校 · 实验小学（围栏内）</string>
+    <string name="gree_profile_diet_dad">健身管理期：推荐西兰花、鸡胸肉等高蛋白低脂食材，晚餐七分饱。</string>
+    <string name="gree_profile_diet_mom">补钙养颜：推荐鲈鱼、嫩豆腐，注意补充胶原蛋白与维生素 C。</string>
+    <string name="gree_profile_diet_grandpa">低盐低脂、软烂易消化：推荐鸡蛋羹、菠菜，注意补铁护心。</string>
+    <string name="gree_profile_diet_girl">成长发育期：推荐鲜牛奶、红富士苹果，少食多餐、少零食。</string>
+    <string name="gree_profile_water_dad">运动后 30 分钟内补水约 300mL，少喝碳酸饮料。</string>
+    <string name="gree_profile_water_mom">晨起一杯 45°C 温水；午后减少咖啡，避免影响睡眠。</string>
+    <string name="gree_profile_water_grandpa">少量多次，睡前 1 小时避免大量饮水；用药期间遵医嘱饮水。</string>
+    <string name="gree_profile_water_girl">避免冰水，课间定时提醒喝水，每日不少于 1.2L。</string>
+
+    <string name="gree_profile_age_label">年龄</string>
+    <string name="gree_profile_height_label">身高</string>
+    <string name="gree_profile_weight_label">体重</string>
+    <string name="gree_profile_age_value">%1$d 岁</string>
+    <string name="gree_profile_height_value">%1$d cm</string>
+    <string name="gree_profile_weight_value">%1$d kg</string>
+    <string name="gree_profile_health_title">健康数据</string>
+    <string name="gree_profile_sleep_title">睡眠情况 · 昨日</string>
+    <string name="gree_profile_sleep_desc">%1$d 小时 %2$d 分 · 入睡 %3$s · 醒来 %4$s</string>
+    <string name="gree_profile_sleep_quality">质量 %1$s</string>
+    <string name="gree_profile_sleep_excellent">优</string>
+    <string name="gree_profile_sleep_good">良</string>
+    <string name="gree_profile_sleep_fair">中</string>
+    <string name="gree_profile_sleep_poor">差</string>
+    <string name="gree_profile_diet_title">饮食注意</string>
+    <string name="gree_profile_water_title">用水注意点</string>
+    <string name="gree_profile_water_settings">饮水设置 ›</string>
+    <string name="gree_profile_geo_title">地理围栏</string>
+    <string name="gree_profile_geo_desc">家 · 围栏半径 500 米，进出围栏自动提醒</string>
+    <string name="gree_profile_fence_in">围栏内</string>
+    <string name="gree_profile_fence_out">围栏外</string>
+    <string name="gree_profile_water_toast">演示环境：饮水设置</string>
 
     <string name="gree_plus_weather">多云 31° · 湿度 82%</string>
     <string name="gree_plus_home_title">我的家概况</string>
@@ -117,11 +192,6 @@
 
     <string name="gree_all_devices_title">全部设备</string>
     <string name="gree_all_devices_back">返回</string>
-    <string name="gree_all_devices_done">完成</string>
-    <string name="gree_all_devices_tip">选择想在首页展示的设备卡片，最多 4 个。</string>
-    <string name="gree_all_devices_summary">已选择 %1$d/%2$d 个设备卡</string>
-    <string name="gree_all_devices_min_tip">至少保留 1 个设备卡</string>
-    <string name="gree_all_devices_max_tip">最多只能选择 4 个设备卡</string>
     <string name="gree_all_devices_state_running">运行中</string>
     <string name="gree_all_devices_state_idle">待机</string>
     <string name="gree_room_all">全屋</string>
@@ -129,7 +199,8 @@
     <string name="gree_all_devices_extra_no_occ">%1$d/%2$d 运行</string>
     <string name="gree_all_devices_occupied">有人</string>
     <string name="gree_all_devices_vacant">无人</string>
-    <string name="gree_all_devices_home_slots">首页展示</string>
+    <string name="gree_all_devices_scene_quick_title">场景快捷控制</string>
+    <string name="gree_all_devices_scene_quick_desc">一键切换常用家庭场景</string>
     <string name="gree_env_temp_label">温度</string>
     <string name="gree_env_humid_label">湿度</string>
     <string name="gree_env_aqi_label">空气质量</string>

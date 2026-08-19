@@ -66,7 +66,7 @@
             android:configChanges="keyboard|keyboardHidden|mcc|mnc|navigation|orientation|screenSize|screenLayout|smallestScreenSize"
             android:launchMode="singleTask"
             android:resumeWhilePausing="true"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             android:theme="@style/HomeScreenTheme"
             android:windowSoftInputMode="adjustPan">

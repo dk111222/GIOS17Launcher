@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -38,15 +37,12 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         MASTER
     }
 
-    private final LinkedHashSet<String> selectedIds = new LinkedHashSet<>();
     private final Map<String, Boolean> powerStates = new HashMap<>();
     private final List<Object> rows = new ArrayList<>();
 
     private TextView titleView;
     private TextView extraView;
-    private TextView summaryView;
     private LinearLayout roomChipRow;
-    private LinearLayout homeChipRow;
     private RoomContentAdapter adapter;
 
     private String currentRoom = GreeDeviceCatalog.ROOM_ALL;
@@ -59,11 +55,8 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
 
         titleView = findViewById(R.id.gree_all_devices_title);
         extraView = findViewById(R.id.gree_all_devices_extra);
-        summaryView = findViewById(R.id.gree_all_devices_summary);
         roomChipRow = findViewById(R.id.gree_all_devices_room_chips);
-        homeChipRow = findViewById(R.id.gree_all_devices_home_chips);
 
-        selectedIds.addAll(GreeDeviceCatalog.getSelectedDeviceIds(this));
         for (GreeDeviceCatalog.FullDevice device : GreeDeviceCatalog.getAllFullDevices()) {
             powerStates.put(device.id, device.defaultOn);
         }
@@ -91,13 +84,10 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         });
 
         bindRoomChips();
-        bindHomeChips();
         refreshRows();
         updateHeader();
-        updateSummary();
 
         findViewById(R.id.gree_all_devices_back).setOnClickListener(v -> finish());
-        findViewById(R.id.gree_all_devices_done).setOnClickListener(v -> saveAndFinish());
     }
 
     private void setupTransparentStatusBar() {
@@ -138,22 +128,6 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
             }
             chip.setOnClickListener(v -> selectRoom(room));
             roomChipRow.addView(chip, params);
-        }
-    }
-
-    private void bindHomeChips() {
-        homeChipRow.removeAllViews();
-        int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f,
-                getResources().getDisplayMetrics());
-        for (GreeDeviceCatalog.DeviceItem item : GreeDeviceCatalog.getAllDevices()) {
-            TextView chip = createChip(getString(item.titleRes), selectedIds.contains(item.id));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (homeChipRow.getChildCount() > 0) {
-                params.setMarginStart(margin);
-            }
-            chip.setOnClickListener(v -> toggleHomeSelection(item));
-            homeChipRow.addView(chip, params);
         }
     }
 
@@ -220,29 +194,6 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         }
     }
 
-    private void updateSummary() {
-        summaryView.setText(getString(R.string.gree_all_devices_summary, selectedIds.size(),
-                GreeDeviceCatalog.MAX_VISIBLE_DEVICES));
-    }
-
-    private void toggleHomeSelection(GreeDeviceCatalog.DeviceItem item) {
-        if (selectedIds.contains(item.id)) {
-            if (selectedIds.size() == 1) {
-                Toast.makeText(this, R.string.gree_all_devices_min_tip, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            selectedIds.remove(item.id);
-        } else {
-            if (selectedIds.size() >= GreeDeviceCatalog.MAX_VISIBLE_DEVICES) {
-                Toast.makeText(this, R.string.gree_all_devices_max_tip, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            selectedIds.add(item.id);
-        }
-        bindHomeChips();
-        updateSummary();
-    }
-
     private boolean isDeviceOn(GreeDeviceCatalog.FullDevice device) {
         Boolean on = powerStates.get(device.id);
         return on != null ? on : device.defaultOn;
@@ -256,11 +207,6 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
         Toast.makeText(this, getString(R.string.gree_device_power_toggled, device.name,
                 next ? getString(R.string.gree_device_power_on) : getString(R.string.gree_device_power_off)),
                 Toast.LENGTH_SHORT).show();
-    }
-
-    private void saveAndFinish() {
-        GreeDeviceCatalog.setSelectedDeviceIds(this, new ArrayList<>(selectedIds));
-        finish();
     }
 
     private final class RoomContentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -410,4 +356,5 @@ public class GreeAllDevicesActivity extends AppCompatActivity {
             }
         }
     }
+
 }

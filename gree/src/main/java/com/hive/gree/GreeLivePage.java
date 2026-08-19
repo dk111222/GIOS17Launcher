@@ -1,10 +1,18 @@
 package com.hive.gree;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.CalendarContract;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,6 +34,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /** Innovation-layout minus-one screen hosted by the gree module. */
 public class GreeLivePage extends FrameLayout {
@@ -106,10 +115,12 @@ public class GreeLivePage extends FrameLayout {
             }
             return false;
         });
-        findViewById(R.id.gree_avatar_btn).setOnClickListener(
-                v -> toast("个人中心"));
+        findViewById(R.id.gree_avatar_btn).setOnClickListener(v ->
+                getContext().startActivity(new Intent(getContext(), ProfileActivity.class)));
+        findViewById(R.id.gree_avatar_wrap).setOnClickListener(v ->
+                getContext().startActivity(new Intent(getContext(), ProfileActivity.class)));
         findViewById(R.id.gree_all_devices_btn).setOnClickListener(
-                v -> toast("全部设备"));
+                v -> getContext().startActivity(new Intent(getContext(), GreeAllDevicesActivity.class)));
         findViewById(R.id.gree_scene_settings_btn).setOnClickListener(
                 v -> toast("场景设置"));
     }
@@ -257,18 +268,46 @@ public class GreeLivePage extends FrameLayout {
             GreeImageClip.clipRound(icon, dp(12));
             ((TextView) card.findViewById(R.id.service_title)).setText(service.titleRes);
             ((TextView) card.findViewById(R.id.service_desc)).setText(service.descRes);
+            int index = row * 2 + col;
             String title = getContext().getString(service.titleRes);
-            card.setOnClickListener(v -> toast(title));
+            card.setOnClickListener(v -> {
+                if (index == 0) {
+                    showCleanServiceDialog();
+                    return;
+                }
+                toast(title);
+            });
             return card;
         });
         equalizeGridCardHeights(grid);
     }
 
+    private void bindWeatherForecast(View weatherCard) {
+        LinearLayout row = weatherCard.findViewById(R.id.gree_weather_forecast_row);
+        row.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        for (GreePhoneWeather.DayForecast day : GreePhoneWeather.FORECAST_5_DAYS) {
+            View item = inflater.inflate(R.layout.item_gree_weather_forecast_day, row, false);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            item.setLayoutParams(lp);
+            ((TextView) item.findViewById(R.id.weather_day_label)).setText(day.labelRes);
+            ((TextView) item.findViewById(R.id.weather_day_condition)).setText(day.conditionRes);
+            ((TextView) item.findViewById(R.id.weather_day_temp)).setText(
+                    getContext().getString(R.string.gree_weather_temp_range, day.lowTemp, day.highTemp));
+            row.addView(item);
+        }
+    }
+
     private void bindPhoneServices() {
         LinearLayout container = findViewById(R.id.gree_phone_services);
         View weather = inflateCard(R.layout.item_gree_weather_card);
+        bindWeatherForecast(weather);
         GreeImageClip.clipRound(weather, getResources().getDimension(R.dimen.gree_card_radius));
-        weather.setOnClickListener(v -> toast("天气"));
+        String weatherUrl = "https://baidu2.weather.com.cn/mweather15d/101320101.shtml";
+        weather.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(weatherUrl));
+            getContext().startActivity(intent);
+        });
         container.addView(wrapFullWidth(weather));
 
         PhoneCard[] cards = {
@@ -294,7 +333,27 @@ public class GreeLivePage extends FrameLayout {
             ((TextView) card.findViewById(R.id.phone_title)).setText(cardData.titleRes);
             ((TextView) card.findViewById(R.id.phone_desc)).setText(cardData.descRes);
             String title = getContext().getString(cardData.titleRes);
-            card.setOnClickListener(v -> toast(title));
+            card.setOnClickListener(v -> {
+                if (index == 0) {
+                    if (openCalendarApp()) {
+                        return;
+                    }
+                    toast(title);
+                    return;
+                }
+                if (index == 1) {
+                    showExpressDialog();
+                    return;
+                }
+                if (index == 2) {
+                    showTripDialog();
+                    return;
+                }
+                if (openNotesApp()) {
+                    return;
+                }
+                toast(title);
+            });
             phoneCardViews[index] = card;
             return card;
         });
@@ -303,8 +362,144 @@ public class GreeLivePage extends FrameLayout {
         View news = inflateCard(R.layout.item_gree_news_card);
         ImageView newsImage = news.findViewById(R.id.news_image);
         GreeImageClip.clipRound(newsImage, dp(14));
-        news.setOnClickListener(v -> toast("新闻速览"));
+        String newsUrl = "https://gree.com/";
+        news.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(newsUrl));
+            getContext().startActivity(intent);
+        });
         container.addView(wrapFullWidth(news, 9));
+    }
+
+    private void showExpressDialog() {
+        showCenteredDialog(
+                "中通快递 · ZT7351881206",
+                "格力净水器 RO 反渗透滤芯\n已到达：菜鸟驿站（小区东门店）\n取件码 8-2-6305\n今天 14:02 入库 · 请及时取件",
+                "好的",
+                null
+        );
+    }
+
+    private void showTripDialog() {
+        showCenteredDialog(
+                "G6158 · 珠海 → 广州南",
+                "周六 10:35 开 · 11:42 到\n二等座 06 车 12A · 张明\n已加入日历，出发前 1 小时提醒你\n珠海站当前客流平稳，建议 9:50 出门",
+                "查看行程详情",
+                null
+        );
+    }
+
+    private void showCleanServiceDialog() {
+        showCenteredDialog(
+                "空调深度清洗预约",
+                "客厅空调 · 累计运行 326 小时\n深度清洗套餐 ¥129（会员价 ¥99）\n最快明天 10:00-12:00 上门 · 格力认证工程师",
+                "预约明天上午上门",
+                () -> toast("已预约：明天 10:00 空调深度清洗上门服务")
+        );
+    }
+
+    private void showCenteredDialog(String title, String message, String buttonText, Runnable action) {
+        Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+
+        LinearLayout root = new LinearLayout(getContext());
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(dp(18), dp(18), dp(18), dp(18));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(22));
+        bg.setColor(Color.parseColor("#FFFDF9"));
+        root.setBackground(bg);
+
+        TextView titleView = new TextView(getContext());
+        titleView.setText(title);
+        titleView.setTextColor(Color.parseColor("#1C1A15"));
+        titleView.setTextSize(15f);
+        titleView.setTypeface(titleView.getTypeface(), android.graphics.Typeface.BOLD);
+
+        TextView messageView = new TextView(getContext());
+        messageView.setText(message);
+        messageView.setTextColor(Color.parseColor("#6D675A"));
+        messageView.setTextSize(11.5f);
+        messageView.setLineSpacing(0f, 1.4f);
+        LinearLayout.LayoutParams messageLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        messageLp.topMargin = dp(8);
+
+        TextView button = new TextView(getContext());
+        button.setText(buttonText);
+        button.setGravity(Gravity.CENTER);
+        button.setTextColor(Color.WHITE);
+        button.setTextSize(13f);
+        button.setTypeface(button.getTypeface(), android.graphics.Typeface.BOLD);
+        GradientDrawable buttonBg = new GradientDrawable();
+        buttonBg.setCornerRadius(dp(18));
+        buttonBg.setColor(Color.parseColor("#DF7642"));
+        button.setBackground(buttonBg);
+        button.setPadding(dp(14), dp(10), dp(14), dp(10));
+        LinearLayout.LayoutParams buttonLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        buttonLp.topMargin = dp(14);
+        button.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (action != null) {
+                action.run();
+            }
+        });
+
+        root.addView(titleView);
+        root.addView(messageView, messageLp);
+        root.addView(button, buttonLp);
+
+        dialog.setContentView(root);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        }
+        dialog.show();
+    }
+
+    private boolean openCalendarApp() {
+        Context context = getContext();
+        PackageManager pm = context.getPackageManager();
+
+        Intent calendarMain = Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_CALENDAR);
+        calendarMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (calendarMain.resolveActivity(pm) != null) {
+            context.startActivity(calendarMain);
+            return true;
+        }
+
+        Intent calendarView = new Intent(Intent.ACTION_VIEW, CalendarContract.CONTENT_URI);
+        calendarView.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (calendarView.resolveActivity(pm) != null) {
+            context.startActivity(calendarView);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean openNotesApp() {
+        Context context = getContext();
+        PackageManager pm = context.getPackageManager();
+        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
+        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> matches = pm.queryIntentActivities(launcherIntent, 0);
+        List<String> keywords = Arrays.asList("便签", "笔记", "记事本", "备忘录", "notes", "note", "keep", "todo", "待办");
+        for (ResolveInfo info : matches) {
+            CharSequence labelCs = info.loadLabel(pm);
+            String label = labelCs == null ? "" : labelCs.toString().toLowerCase(Locale.ROOT);
+            for (String keyword : keywords) {
+                if (label.contains(keyword.toLowerCase(Locale.ROOT))) {
+                    Intent launch = pm.getLaunchIntentForPackage(info.activityInfo.packageName);
+                    if (launch != null) {
+                        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(launch);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private View wrapFullWidth(View child) {
